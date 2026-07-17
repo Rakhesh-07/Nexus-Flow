@@ -1,0 +1,60 @@
+# --- NexusFlow Git Ignore Rules ---
+
+# Credentials & Sensitive Environments
+.env
+*.env
+backend/.env
+
+# Local Databases & Persistent Storage
+*.db
+*.sqlite
+backend/aiflow.db
+test.db
+
+# Vector Collections (ChromaDB)
+chroma_db/
+backend/chroma_db/
+
+# Logs & Diagnostics
+*.log
+backend/aiflow_backend.log
+aiflow_backend.log
+
+# User Uploaded Ingestion Files
+backend/uploads/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+bin/
+lib/
+include/
+
+# Python Cache & Compiled Files
+__pycache__/
+backend/__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing Caches & Coverage
+.pytest_cache/
+backend/.pytest_cache/
+.coverage
+htmlcov/
+
+# Specification Files (Requested to exclude)
+AIFlow_Enterprise_MultiAgent_AI_Workflow_Orchestrator.md
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

@@ -1,0 +1,41 @@
+# AIFlow Corp - Annual Sales & Financial Report (FY 2025)
+
+## Executive Summary
+For the fiscal year 2025 (FY2025), AIFlow Corp achieved a total gross revenue of $14,850,000, representing a 22.4% year-over-year increase compared to FY2024 ($12,130,000). Net profit margin reached 18.5%, yielding a net income of $2,747,250.
+
+---
+
+## Quarterly Revenue Breakdown
+* **Q1 2025**: $3,120,000 (driven by winter software subscriptions)
+* **Q2 2025**: $3,450,000 (lifted by enterprise renewals)
+* **Q3 2025**: $3,880,000 (bolstered by new consulting service cohorts)
+* **Q4 2025**: $4,400,000 (record-breaking holiday enterprise contracts)
+
+---
+
+## Regional Sales Performance
+* **North America (NA)**: $6,830,000 (46% of total revenue)
+* **Europe, Middle East, and Africa (EMEA)**: $4,158,000 (28% of total revenue)
+* **Asia-Pacific (APAC)**: $2,673,000 (18% of total revenue)
+* **Latin America (LATAM)**: $1,189,000 (8% of total revenue)
+
+---
+
+## Product Categories & Performance
+1. **AIFlow Orchestration Engine (Core)**:
+   * Revenue: $8,910,000
+   * License count: 450 enterprise accounts
+   * Average contract value (ACV): $19,800
+2. **Consulting & Custom Integrations**:
+   * Revenue: $3,564,000
+   * Projects completed: 72 engagements
+   * Average project price: $49,500
+3. **Training & Support Subscriptions**:
+   * Revenue: $2,376,000
+   * Renewal rate: 89.2%
+
+---
+
+## Strategic Growth Areas
+* **AI Security Modules**: In Q4, we launched a beta version of our compliance auditing framework which brought in $450,000 in early access fees (included in Core revenue).
+* **Cloud Infrastructure Optimization**: Cloud migration reduced operating costs from $1,850,000 in FY2024 to $1,420,000 in FY2025.

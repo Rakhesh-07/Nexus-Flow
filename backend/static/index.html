@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIFlow - Enterprise Multi-Agent Workflow Orchestrator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background grid effect -->
+    <div class="grid-overlay"></div>
+
+    <!-- MAIN CONTAINER -->
+    <div id="app">
+        <!-- AUTH VIEW (Register / Login) -->
+        <div id="auth-view" class="auth-container card">
+            <div class="auth-header">
+                <h2>AIFlow</h2>
+                <p>Enterprise Multi-Agent Workflow Orchestrator</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <button id="tab-login-btn" class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+                <button id="tab-register-btn" class="auth-tab" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)" autocomplete="off">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" placeholder="Enter username" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Authenticate</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="hidden" onsubmit="handleRegister(event)" autocomplete="off">
+                <div class="form-group">
+                    <label for="register-username">Username</label>
+                    <input type="text" id="register-username" placeholder="Choose username" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" placeholder="Choose password (min 6 chars)" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="register-role">Default Access Role</label>
+                    <select id="register-role">
+                        <option value="user">Standard User</option>
+                        <option value="admin">Admin / Manager</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+            </form>
+
+            <div id="auth-error" class="error-msg hidden"></div>
+        </div>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard-view" class="dashboard-container hidden">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-brand">
+                    <h3>AIFlow</h3>
+                    <span id="user-role-badge" class="badge badge-user">User</span>
+                </div>
+                
+                <nav class="sidebar-menu">
+                    <button class="nav-item active" onclick="switchView('chat')">
+                        <span class="icon">💬</span> Chat Swarm
+                    </button>
+                    <button class="nav-item" onclick="switchView('upload')">
+                        <span class="icon">📁</span> Ingest Documents
+                    </button>
+                    <button class="nav-item" onclick="switchView('analytics')">
+                        <span class="icon">📊</span> Usage Analytics
+                    </button>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <div class="user-profile">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info">
+                            <span id="current-username" class="username">Guest</span>
+                            <span class="status-online">Online</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary btn-block btn-logout" onclick="handleLogout()">Logout</button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- CHAT MODULE -->
+                <section id="chat-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Chat Swarm</h2>
+                        <p>Ask questions. The orchestrator will dynamically route, retrieve, and validator outputs.</p>
+                    </div>
+
+                    <div class="chat-container card">
+                        <div id="chat-messages" class="chat-messages-area">
+                            <div class="system-message">
+                                <p>Welcome to AIFlow Swarm. Ask questions about your ingested RAG documents, run queries, or execute math calculations.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input-area">
+                            <form id="chat-form" onsubmit="handleSendMessage(event)">
+                                <input type="text" id="chat-input" placeholder="Ask AIFlow orchestrator..." required autocomplete="off">
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- INGEST UPLOAD MODULE -->
+                <section id="upload-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>Ingest Documents</h2>
+                        <p>Upload files to parse, chunk, and embed them into the multi-tenant Vector Database.</p>
+                    </div>
+
+                    <div class="upload-container card">
+                        <div class="drag-drop-zone" id="drop-zone" onclick="triggerFileSelect()">
+                            <span class="upload-icon">📤</span>
+                            <p>Drag and drop multiple text/PDF/markdown documents here</p>
+                            <span class="btn btn-secondary">Select Files</span>
+                            <input type="file" id="file-input" multiple class="hidden" onchange="handleFileSelect(event)">
+                        </div>
+
+                        <!-- Upload File Queue -->
+                        <div id="file-queue-container" class="file-queue-container hidden">
+                            <h4>Selected Files Queue</h4>
+                            <div id="file-list" class="file-list"></div>
+                            
+                            <div class="upload-actions">
+                                <button class="btn btn-primary" onclick="uploadQueuedFiles()">Ingest Files</button>
+                                <button class="btn btn-secondary" onclick="clearFileQueue()">Clear Queue</button>
+                            </div>
+                        </div>
+
+                        <!-- Confirmation & Progress Status -->
+                        <div id="upload-status" class="upload-status card hidden">
+                            <h4 id="status-heading">Processing Documents...</h4>
+                            <div class="progress-bar-container">
+                                <div id="status-progress-bar" class="progress-bar"></div>
+                            </div>
+                            <p id="status-details"></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- USAGE ANALYTICS MODULE -->
+                <section id="analytics-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>Usage Analytics</h2>
+                        <p>Monitor platform statistics, cost evaluations, and token consumption summaries.</p>
+                    </div>
+
+                    <!-- USER ANALYTICS TAB -->
+                    <div id="user-analytics" class="analytics-wrapper">
+                        <!-- Stats Grid -->
+                        <div class="stats-grid">
+                            <div class="stat-card card">
+                                <h3>Total Queries</h3>
+                                <p id="user-total-queries" class="stat-value">-</p>
+                            </div>
+                            <div class="stat-card card">
+                                <h3>Documents Ingested</h3>
+                                <p id="user-total-documents" class="stat-value">-</p>
+                            </div>
+                            <div class="stat-card card">
+                                <h3>Total Tokens Consumed</h3>
+                                <p id="user-total-tokens" class="stat-value">-</p>
+                            </div>
+                        </div>
+
+                        <!-- Personal Query History Table -->
+                        <div class="table-container card">
+                            <h3>Query History Log</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Query</th>
+                                        <th>Status</th>
+                                        <th>Tokens Used</th>
+                                        <th>Latency</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-history-tbody">
+                                    <tr>
+                                        <td colspan="5" class="text-center">No queries logged yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ADMIN / MANAGER ANALYTICS TAB -->
+                    <div id="admin-analytics" class="analytics-wrapper hidden">
+                        <div class="tab-divider">Admin Portal Overview</div>
+                        
+                        <!-- Global Stats Grid -->
+                        <div class="stats-grid">
+                            <div class="stat-card card">
+                                <h3>Global Queries Run</h3>
+                                <p id="admin-total-queries" class="stat-value">-</p>
+                            </div>
+                            <div class="stat-card card">
+                                <h3>Total Vector Files</h3>
+                                <p id="admin-total-documents" class="stat-value">-</p>
+                            </div>
+                            <div class="stat-card card">
+                                <h3>Cumulative Cost ($)</h3>
+                                <p id="admin-total-cost" class="stat-value" style="color: #00ff66;">$0.00</p>
+                            </div>
+                            <div class="stat-card card">
+                                <h3>Avg. Swarm Latency</h3>
+                                <p id="admin-avg-latency" class="stat-value">-</p>
+                            </div>
+                        </div>
+
+                        <!-- User Breakdown Table -->
+                        <div class="table-container card">
+                            <h3>Platform Users Usage Summary</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Queries Run</th>
+                                        <th>Files Uploaded</th>
+                                        <th>Total Tokens</th>
+                                        <th>Last Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-users-tbody">
+                                    <tr>
+                                        <td colspan="7" class="text-center">No user data retrieved.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

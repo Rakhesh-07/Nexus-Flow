@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusFlow - Enterprise Multi-Agent AI Workflow Orchestrator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0c10;
+            --bg-secondary: #131520;
+            --card-bg: rgba(20, 22, 34, 0.65);
+            --border-color: rgba(255, 255, 255, 0.06);
+            --border-glow: rgba(0, 102, 255, 0.25);
+            
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            
+            --accent: #0066ff;
+            --accent-glow: rgba(0, 102, 255, 0.4);
+            --success: #00ff66;
+            --success-glow: rgba(0, 255, 102, 0.2);
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* Ambient glowing background */
+        .ambient-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 102, 255, 0.08) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            z-index: -2;
+            pointer-events: none;
+            filter: blur(80px);
+        }
+
+        /* Tech grid overlay */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.005) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center center;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Presentation Container */
+        .presentation {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Presentation Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 48px;
+            height: 80px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(11, 12, 16, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 20;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 1.5px;
+        }
+
+        .header-logo span {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .meta-tag {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        /* Slides Wrapper */
+        .slides-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: calc(100vh - 140px); /* header + footer */
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.96) translateY(10px);
+            transition: var(--transition-slow);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 100px;
+            z-index: 5;
+        }
+
+        /* Slide States */
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+            z-index: 10;
+        }
+
+        .slide.past {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.96) translateY(-20px);
+            z-index: 5;
+        }
+
+        .slide.future {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.96) translateY(20px);
+            z-index: 5;
+        }
+
+        /* Slide Content Components */
+        .slide-content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide-title-group {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .slide.left-align .slide-title-group {
+            text-align: left;
+        }
+
+        .slide-title {
+            font-family: var(--font-display);
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+
+        .slide-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Slide 1: Welcome */
+        .title-slide {
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            font-family: var(--font-display);
+            font-size: 84px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent) 70%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px rgba(0, 102, 255, 0.15));
+        }
+
+        .title-slide .badge-enterprise {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 255, 102, 0.1) 100%);
+            border: 1px solid var(--accent);
+            padding: 6px 18px;
+            border-radius: 99px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin-bottom: 24px;
+        }
+
+        .title-slide p {
+            font-size: 22px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            line-height: 1.5;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #0052cc 100%);
+            border: none;
+            padding: 14px 32px;
+            color: white;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.35);
+            transition: var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.5);
+        }
+
+        /* Cards Grid Layout */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .cards-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .cards-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 32px 0 rgba(0, 102, 255, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .glass-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .danger-card {
+            border-left: 3px solid var(--danger);
+        }
+
+        .success-card {
+            border-left: 3px solid var(--success);
+        }
+
+        /* Large Split Layout */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .split-layout.reverse {
+            grid-template-columns: 0.8fr 1.2fr;
+        }
+
+        .split-text h3 {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .split-text p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .split-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Interactive Graph Sandbox */
+        .graph-explorer {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            background: rgba(20, 22, 34, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            min-height: 420px;
+        }
+
+        .graph-canvas {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: rgba(11, 12, 16, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .swarm-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .graph-node-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 2;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .node-row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        .graph-node {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            min-width: 110px;
+            font-weight: 500;
+        }
+
+        .graph-node:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 102, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .graph-node.active-node {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.3) 0%, rgba(0, 102, 255, 0.1) 100%);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .graph-node.success-node.active-node {
+            background: linear-gradient(135deg, rgba(0, 255, 102, 0.3) 0%, rgba(0, 255, 102, 0.1) 100%);
+            border-color: var(--success);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+        }
+
+        .graph-node.warning-node.active-node {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(245, 158, 11, 0.1) 100%);
+            border-color: var(--warning);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .graph-detail-panel {
+            background: rgba(11, 12, 16, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .detail-name {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .detail-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+        }
+
+        .detail-body {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .detail-item {
+            margin-bottom: 16px;
+        }
+
+        .detail-item-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .detail-code {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #a7f3d0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Interactive Cache Simulator */
+        .cache-simulator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            background: rgba(20, 22, 34, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            min-height: 400px;
+        }
+
+        .simulator-control {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .query-box {
+            background: rgba(11, 12, 16, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: var(--font-sans);
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .query-box::before {
+            content: "USER QUERY";
+            position: absolute;
+            top: -9px;
+            left: 12px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            background: var(--bg-primary);
+            padding: 0 6px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .sim-btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .sim-btn {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 6px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+
+        .sim-btn-miss {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .sim-btn-miss:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-secondary);
+        }
+
+        .sim-btn-hit {
+            background: linear-gradient(135deg, var(--accent) 0%, #0052cc 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 102, 255, 0.25);
+        }
+
+        .sim-btn-hit:hover {
+            box-shadow: 0 0 25px rgba(0, 102, 255, 0.4);
+        }
+
+        .simulator-display {
+            background: rgba(11, 12, 16, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .sim-results {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sim-stat-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .sim-stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .sim-stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .sim-stat-val {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .sim-stat-val.color-accent { color: var(--accent); }
+        .sim-stat-val.color-success { color: var(--success); }
+        .sim-stat-val.color-danger { color: var(--danger); }
+
+        .sim-flow-desc {
+            border-left: 2px solid rgba(255, 255, 255, 0.08);
+            padding-left: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .sim-flow-desc ul {
+            margin-top: 8px;
+            margin-left: 16px;
+        }
+
+        /* Tech stack grid icons */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .tech-card {
+            background: rgba(20, 22, 34, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+
+        .tech-card:hover {
+            border-color: var(--border-glow);
+            transform: scale(1.03);
+            background: rgba(20, 22, 34, 0.8);
+        }
+
+        .tech-badge {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .tech-name {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .tech-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Code block panel */
+        .code-panel {
+            background: rgba(11, 12, 16, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: #d1d5db;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            line-height: 1.6;
+        }
+
+        .code-panel::before {
+            content: "docker-compose.yml";
+            position: absolute;
+            top: 4px;
+            right: 12px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* Presentation Footer Controls */
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 48px;
+            height: 60px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(11, 12, 16, 0.9);
+            z-index: 20;
+        }
+
+        .controls-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition-fast);
+            font-size: 14px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-secondary);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .slide-progress {
+            display: flex;
+            gap: 8px;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .progress-dot.active {
+            background: var(--accent);
+            transform: scale(1.2);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Help tooltip */
+        .kbd-guide {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+        }
+
+        /* Animations */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 15px rgba(0, 102, 255, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(0, 102, 255, 0.4); }
+            100% { box-shadow: 0 0 15px rgba(0, 102, 255, 0.2); }
+        }
+
+        .pulse-element {
+            animation: pulse-glow 3s infinite;
+        }
+
+        /* Slide specific styling */
+        .stat-grid-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card-dashboard {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: left;
+        }
+
+        .stat-val-dashboard {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 4px;
+        }
+
+        .stat-val-dashboard.color-accent { color: var(--accent); }
+        .stat-val-dashboard.color-success { color: var(--success); }
+        .stat-val-dashboard.color-warning { color: var(--warning); }
+
+        .dashboard-table-preview {
+            background: rgba(11, 12, 16, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        .table-title {
+            font-family: var(--font-display);
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title span {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--success);
+            background: rgba(0, 255, 102, 0.08);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .table-mock {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .table-mock th {
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .table-mock td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+        }
+
+        .table-mock tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-user-mock {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+        }
+
+        .badge-user-mock.admin {
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--accent);
+        }
+
+        .badge-user-mock.user {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+        }
+
+        /* SVG arrows for connection rendering */
+        .svg-arrow {
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 1.5;
+            fill: none;
+            marker-end: url(#arrowhead);
+            transition: all 0.3s ease;
+        }
+
+        .svg-arrow.highlighted {
+            stroke: var(--accent);
+            stroke-width: 2.5;
+            filter: drop-shadow(0 0 4px var(--accent));
+        }
+
+        /* Responsive warning block */
+        .screen-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-primary);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        @media (max-height: 550px) or (max-width: 768px) {
+            .screen-warning {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-warning">
+        <h2 style="font-family: var(--font-display); margin-bottom: 16px; color: var(--danger);">Screen Too Small</h2>
+        <p style="color: var(--text-secondary); font-size: 14px; max-width: 400px; line-height: 1.5;">
+            NexusFlow presentation requires a larger screen size. Please maximize your window or view on a desktop device for the optimal experience.
+        </p>
+    </div>
+
+    <!-- Background Design Elements -->
+    <div class="ambient-glow"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="presentation">
+        
+        <!-- Header -->
+        <header>
+            <a href="#" class="header-logo">
+                <span>NEXUS</span>FLOW
+            </a>
+            <div class="header-meta">
+                <span class="meta-tag">Enterprise Multi-Agent Orchestrator</span>
+                <span id="current-slide-num">01 / 10</span>
+            </div>
+        </header>
+
+        <!-- Slides Container -->
+        <div class="slides-container" id="slides-wrapper">
+            
+            <!-- Slide 1: Welcome Title -->
+            <div class="slide welcome-slide active" data-slide="1">
+                <div class="slide-content title-slide">
+                    <span class="badge-enterprise">Enterprise-Grade AI Stack</span>
+                    <h1>NEXUSFLOW</h1>
+                    <p>
+                        A production-grade, secure, multi-agent AI orchestration platform built for high-performance enterprise decision making, semantic query optimization, and strict multi-tenant isolation.
+                    </p>
+                    <div>
+                        <button class="start-btn pulse-element" onclick="nextSlide()">
+                            Start Presentation
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: The Enterprise Challenge -->
+            <div class="slide left-align" data-slide="2">
+                <div class="slide-content">
+                    <div class="slide-title-group">
+                        <h2 class="slide-title">The Enterprise AI Dilemma</h2>
+                        <p class="slide-subtitle">Why simple chat integrations fail in professional environments</p>
+                    </div>
+                    <div class="cards-grid-4">
+                        <div class="glass-card danger-card">
+                            <span class="card-icon">⚠️</span>
+                            <h3 class="card-title">Hallucination & Risk</h3>
+                            <p class="card-desc">LLMs lack standard guardrails out-of-the-box, outputting false code, erroneous SQL, or non-compliant corporate answers.</p>
+                        </div>
+                        <div class="glass-card danger-card">
+                            <span class="card-icon">🔒</span>
+                            <h3 class="card-title">Data Leakage</h3>
+                            <p class="card-desc">No built-in tenant partition. Uploaded business files are indexed globally, leaking proprietary IP between normal users.</p>
+                        </div>
+                        <div class="glass-card danger-card">
+                            <span class="card-icon">💸</span>
+                            <h3 class="card-title">Exploding Cost</h3>
+                            <p class="card-desc">Repeated queries traverse the full LLM context pipeline, consuming massive amounts of API tokens and driving up operational billing.</p>
+                        </div>
+                        <div class="glass-card danger-card">
+                            <span class="card-icon">🕵️‍♂️</span>
+                            <h3 class="card-title">Zero Observability</h3>
+                            <p class="card-desc">Standard endpoints act as 'black boxes'. No tracing, latency metrics, performance audit logging, or monitoring interfaces.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: The Core Solution -->
+            <div class="slide left-align" data-slide="3">
+                <div class="slide-content">
+                    <div class="slide-title-group">
+                        <h2 class="slide-title">Introducing NexusFlow</h2>
+                        <p class="slide-subtitle">The enterprise answer to secure, auditable, and cost-controlled AI</p>
+                    </div>
+                    <div class="cards-grid-2">
+                        <div class="glass-card success-card">
+                            <h3 class="card-title">LangGraph Multi-Agent Orchestration</h3>
+                            <p class="card-desc">
+                                Deconstructs user requests into structural, state-driven workflow paths. Connects Planner, Retriever, Reasoner, and Validator agents into an iterative cycle to guarantee schema-compliance and fact-based accuracy.
+                            </p>
+                        </div>
+                        <div class="glass-card success-card">
+                            <h3 class="card-title">Strict Multi-Tenant RAG Isolation</h3>
+                            <p class="card-desc">
+                                Secures files using JWT-authenticated session metadata. Enforces programmatic filters on vector database query retrievals so users can never search or access other accounts' files.
+                            </p>
+                        </div>
+                        <div class="glass-card success-card">
+                            <h3 class="card-title">Sub-50ms Local Semantic Caching</h3>
+                            <p class="card-desc">
+                                Leverages local vector comparisons to immediately resolve repeated or closely matching queries. Bypasses the LLM completely for cached hits, dropping costs to $0.
+                            </p>
+                        </div>
+                        <div class="glass-card success-card">
+                            <h3 class="card-title">Sandboxed Execution & Observability</h3>
+                            <p class="card-desc">
+                                Runs generated code via safe AST executors and read-only parameterized engines. Exposes full telemetry using OpenTelemetry, Prometheus, and Grafana.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Multi-Agent Swarm Graph Explorer -->
+            <div class="slide left-align" data-slide="4">
+                <div class="slide-content">
+                    <div class="slide-title-group">
+                        <h2 class="slide-title">LangGraph Swarm Engine</h2>
+                        <p class="slide-subtitle">Interactive: Click on any agent node to explore its role, prompt instructions, and outputs</p>
+                    </div>
+                    
+                    <div class="graph-explorer">
+                        <!-- Left Side: Interactive SVG Graph Node Graph -->
+                        <div class="graph-canvas">
+                            <svg class="swarm-connections" viewBox="0 0 400 350">
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="14" refY="3" orient="auto">
+                                        <polygon points="0 0, 6 3, 0 6" fill="rgba(255, 255, 255, 0.15)"></polygon>
+                                    </marker>
+                                </defs>
+                                <!-- Connections -->
+                                <path id="arrow-1" class="svg-arrow" d="M 200,50 L 110,110"></path>
+                                <path id="arrow-2" class="svg-arrow" d="M 110,130 L 110,190"></path>
+                                <path id="arrow-3" class="svg-arrow" d="M 110,210 L 200,270"></path>
+                                <path id="arrow-4" class="svg-arrow" d="M 200,50 L 290,110"></path>
+                                <path id="arrow-5" class="svg-arrow" d="M 290,130 L 290,190"></path>
+                                <path id="arrow-6" class="svg-arrow" d="M 290,210 L 200,270"></path>
+                                <path id="arrow-7" class="svg-arrow" d="M 200,290 L 200,50" stroke-dasharray="4,4"></path> <!-- Loop back -->
+                            </svg>
+                            
+                            <div class="graph-node-container">
+                                <!-- Planner Node -->
+                                <div class="node-row">
+                                    <div class="graph-node active-node" id="node-planner" onclick="selectNode('planner')">Planner Node</div>
+                                </div>
+                                <!-- Layer 2: Retriever & Tool Agent -->
+                                <div class="node-row">
+                                    <div class="graph-node" id="node-retriever" onclick="selectNode('retriever')">Retriever (RAG)</div>
+                                    <div class="graph-node" id="node-tool" onclick="selectNode('tool')">Tool Agent</div>
+                                </div>
+                                <!-- Layer 3: Researcher & Reasoner -->
+                                <div class="node-row">
+                                    <div class="graph-node" id="node-researcher" onclick="selectNode('researcher')">Researcher</div>
+                                    <div class="graph-node" id="node-reasoner" onclick="selectNode('reasoner')">Reasoner Node</div>
+                                </div>
+                                <!-- Layer 4: Validator -->
+                                <div class="node-row">
+                                    <div class="graph-node warning-node" id="node-validator" onclick="selectNode('validator')">Validator (Loop)</div>
+                                </div>
+                                <!-- Layer 5: Response Agent -->
+                                <div class="node-row">
+                                    <div class="graph-node success-node" id="node-responder" onclick="selectNode('responder')">Response Node</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Details Card -->
+                        <div class="graph-detail-panel" id="agent-detail-card">
+                            <div class="detail-header">
+                                <span class="detail-name" id="agent-title">Planner Node</span>
+                                <span class="detail-tag" id="agent-type">ORCHESTRATION</span>
+                            </div>
+                            <div class="detail-body">
+                                <div class="detail-item">
+                                    <div class="detail-item-title">Core Responsibility</div>
+                                    <p id="agent-desc">Analyzes incoming user prompts, maps dependencies, and generates a structured execution plan. Determines whether custom tools or external document contexts are required.</p>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-item-title">Guaranteed Output Schema</div>
+                                    <pre class="detail-code" id="agent-schema">{
+  "plan_steps": ["step1", "step2"],
+  "requires_rag": true,
+  "assigned_tools": ["sql_runner"]
+}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Safe Sandboxed Tooling -->
+            <div class="slide left-align" data-slide="5">
+                <div class="slide-content">
+                    <div class="slide-title-group">
+                        <h2 class="slide-title">Zero-Trust Tool Execution</h2>
+                        <p class="slide-subtitle">Safeguarding database nodes and internal systems from untrusted agent code</p>
+                    </div>
+                    <div class="cards-grid-4">
+                        <div class="glass-card">
+                            <span class="card-icon" style="color: #38bdf8;">🐍</span>
+                            <h3 class="card-title">Python AST Sandbox</h3>
+                            <p class="card-desc">
+                                Evaluates Python scripts dynamically. Parses variables through an Abstract Syntax Tree (AST) compiler, blocking `import`, file writes, and infinite loops prior to evaluation.
+                            </p>
+                        </div>
+                        <div class="glass-card">
+                            <span class="card-icon" style="color: #34d399;">🛢️</span>
+                            <h3 class="card-title">Read-Only SQL Runner</h3>
+                            <p class="card-desc">
+                                Inspects query statements. Enforces read-only permissions and binds execution variables, completely neutralizing SQL injections and database modification risks.
+                            </p>
+                        </div>
+                        <div class="glass-card">
+                            <span class="card-icon" style="color: #a78bfa;">🌐</span>
+                            <h3 class="card-title">Secure REST Client</h3>
+                            <p class="card-desc">
+                                Employs custom HTTP request validation. Restricts outbound calls to approved domains and manages authorization keys securely, shielding local networks from SSRF attacks.
+                            </p>
+                        </div>
+                        <div class="glass-card">
+                            <span class="card-icon" style="color: #f472b6;">🧮</span>
+                            <h3 class="card-title">Safe Calculator</h3>
+                            <p class="card-desc">
+                                Computes equations without utilizing python's dangerous `eval()`. Parses mathematical strings using a strict token analyzer to block remote script executions.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Multi-Tenant RAG Pipeline -->
+            <div class="slide left-align" data-slide="6">
+                <div class="slide-content">
+                    <div class="split-layout">
+                        <div class="split-text">
+                            <div class="slide-title-group" style="text-align: left; margin-bottom: 24px;">
+                                <h2 class="slide-title">Secure Multi-Tenant RAG</h2>
+                                <p class="slide-subtitle">Strict tenant boundary control at the data layer</p>
+                            </div>
+                            <h3>Programmatic isolation</h3>
+                            <p>
+                                NexusFlow features a secure ingestion framework that parses PDF, TXT, and Markdown files, chunks content, and generates vector representations with standard embeddings.
+                            </p>
+                            <p>
+                                Security is hardcoded into retrievals. All database similarity queries automatically inject JWT authenticated parameters: <code>where={"user_id": current_user.id}</code>.
+                            </p>
+                            <p style="color: var(--success); font-weight: 500;">
+                                Result: Standard users can never view, search, or leak data belonging to other corporate accounts.
+                            </p>
+                        </div>
+                        
+                        <div class="split-visual">
+                            <div class="glass-card" style="width: 100%; border-color: rgba(0, 255, 102, 0.15);">
+                                <h4 style="font-family: var(--font-mono); font-size: 13px; color: var(--success); margin-bottom: 12px;">Query Assembly Verification</h4>
+                                <pre style="font-family: var(--font-mono); font-size: 11px; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 6px; color: #a7f3d0; line-height: 1.5; overflow-x: auto;">
+# ChromaDB Isolated Retrieval API
+results = collection.query(
+    query_embeddings=[query_vector],
+    n_results=top_k,
+    where={
+        "user_id": current_user.id # STRICT ISOLATION
+    }
+)
+return results</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Semantic Caching Engine -->
+            <div class="slide left-align" data-slide="7">
+                <div class="slide-content">
+                    <div class="slide-title-group">
+                        <h2 class="slide-title">Low-Cost Semantic Caching</h2>
+                        <p class="slide-subtitle">Interactive: Test the performance differences between a Cache Miss and a Cache Hit</p>
+                    </div>
+                    
+                    <div class="cache-simulator">
+                        <!-- Left Controls -->
+                        <div class="simulator-control">
+                            <div class="query-box">
+                                "What was the total profit margin for Q3 as discussed in the financial statement?"
+                            </div>
+                            <div class="sim-btn-group">
+                                <button class="sim-btn sim-btn-miss" onclick="simulateCache(false)">
+                                    Simulate Cache Miss
+                                </button>
+                                <button class="sim-btn sim-btn-hit" onclick="simulateCache(true)">
+                                    Simulate Cache Hit
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right Stats/Display -->
+                        <div class="simulator-display" id="sim-output">
+                            <div class="sim-results">
+                                <div style="font-family: var(--font-display); font-size: 18px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                    Cache Engine Output
+                                </div>
+                                <div class="sim-stat-row">
+                                    <div class="sim-stat-card">
+                                        <div class="sim-stat-label">Latency</div>
+                                        <div class="sim-stat-val" id="sim-latency">-</div>
+                                    </div>
+                                    <div class="sim-stat-card">
+                                        <div class="sim-stat-label">Token Cost</div>
+                                        <div class="sim-stat-val" id="sim-cost">-</div>
+                                    </div>
+                                    <div class="sim-stat-card">
+                                        <div class="sim-stat-label">Source</div>
+                                        <div class="sim-stat-val" id="sim-source">-</div>
+                                    </div>
+                                </div>
+                                <div class="sim-flow-desc" id="sim-explanation">
+                                    Click one of the buttons on the left to trigger the simulator.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Observability & Analytics -->
+            <div class="slide left-align" data-slide="8">
+                <div class="slide-content">
+                    <div class="slide-title-group">
+                        <h2 class="slide-title">Observability & Admin Analytics</h2>
+                        <p class="slide-subtitle">Granular performance charts and cost breakdowns</p>
+                    </div>
+                    
+                    <!-- Stats panel -->
+                    <div class="stat-grid-dashboard">
+                        <div class="stat-card-dashboard">
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Total Queries Run</div>
+                            <div class="stat-val-dashboard color-accent">1,482</div>
+                        </div>
+                        <div class="stat-card-dashboard">
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Avg Agent Latency</div>
+                            <div class="stat-val-dashboard">320ms</div>
+                        </div>
+                        <div class="stat-card-dashboard">
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Semantic Cache Hits</div>
+                            <div class="stat-val-dashboard color-success">64.2%</div>
+                        </div>
+                        <div class="stat-card-dashboard">
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Platform Cost Savings</div>
+                            <div class="stat-val-dashboard color-warning">$184.50</div>
+                        </div>
+                    </div>
+
+                    <!-- Table Preview mockup -->
+                    <div class="dashboard-table-preview">
+                        <div class="table-title">
+                            Global User Token Analytics 
+                            <span>LIVE METRICS (OpenTelemetry)</span>
+                        </div>
+                        <table class="table-mock">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Total Queries</th>
+                                    <th>Total Input Tokens</th>
+                                    <th>Total Output Tokens</th>
+                                    <th>Billing Contribution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>admin_nexus</td>
+                                    <td><span class="badge-user-mock admin">ADMIN</span></td>
+                                    <td>582</td>
+                                    <td>4,250,000</td>
+                                    <td>1,210,000</td>
+                                    <td>$0.682 (64% cache-reduced)</td>
+                                </tr>
+                                <tr>
+                                    <td>john_consultant</td>
+                                    <td><span class="badge-user-mock user">USER</span></td>
+                                    <td>298</td>
+                                    <td>2,100,000</td>
+                                    <td>580,000</td>
+                                    <td>$0.331 (55% cache-reduced)</td>
+                                </tr>
+                                <tr>
+                                    <td>sara_analyst</td>
+                                    <td><span class="badge-user-mock user">USER</span></td>
+                                    <td>104</td>
+                                    <td>940,000</td>
+                                    <td>210,000</td>
+                                    <td>$0.133 (71% cache-reduced)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9: Tech Stack -->
+            <div class="slide left-align" data-slide="9">
+                <div class="slide-content">
+                    <div class="slide-title-group">
+                        <h2 class="slide-title">The Enterprise Technology Stack</h2>
+                        <p class="slide-subtitle">A modern, reliable ecosystem for microservices and AI operations</p>
+                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-card">
+                            <span class="tech-badge">API Layer</span>
+                            <h3 class="tech-name">FastAPI</h3>
+                            <p class="tech-desc">Asynchronous Python web framework with auto-generated OpenAPI documents and robust REST routing.</p>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-badge">AI Logic</span>
+                            <h3 class="tech-name">LangGraph</h3>
+                            <p class="tech-desc">Stateful multi-agent system builder, supporting circular evaluation loops and node-based transitions.</p>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-badge">Vector DB</span>
+                            <h3 class="tech-name">ChromaDB</h3>
+                            <p class="tech-desc">Local storage system utilized for document embeddings and sub-millisecond semantic caching matches.</p>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-badge">Observability</span>
+                            <h3 class="tech-name">OTel + Prometheus</h3>
+                            <p class="tech-desc">OpenTelemetry logging integrated with Prometheus scraping and beautiful Grafana dashboards.</p>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-badge">RAG Context</span>
+                            <h3 class="tech-name">Gemini / OpenAI</h3>
+                            <p class="tech-desc">Google Generative Language and OpenAI model providers, dynamically routing text generations.</p>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-badge">Database</span>
+                            <h3 class="tech-name">PostgreSQL</h3>
+                            <p class="tech-desc">SQLAlchemy-driven persistence layer storing user tables, conversations, and workflow trace states.</p>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-badge">Memory Cache</span>
+                            <h3 class="tech-name">Redis</h3>
+                            <p class="tech-desc">Memory storage layer utilized for session tokens, FastAPI responses, and rate limiters.</p>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-badge">Environment</span>
+                            <h3 class="tech-name">Docker</h3>
+                            <p class="tech-desc">Multi-container Docker Compose file standing up Postgres, Redis, Prometheus, Grafana, and backend services.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 10: Conclusion / Get Started -->
+            <div class="slide left-align" data-slide="10">
+                <div class="slide-content">
+                    <div class="split-layout reverse">
+                        <div class="split-visual">
+                            <div class="code-panel" style="width: 100%;">
+<pre style="margin: 0; color: #34d399;">version: '3.8'
+services:
+  backend:
+    build: ./backend
+    ports: ["8000:8000"]
+    depends_on: [postgres, redis, chroma]
+  postgres:
+    image: postgres:15
+  redis:
+    image: redis:alpine
+  prometheus:
+    image: prom/prometheus
+  grafana:
+    image: grafana/grafana</pre>
+                            </div>
+                        </div>
+                        <div class="split-text">
+                            <div class="slide-title-group" style="text-align: left; margin-bottom: 24px;">
+                                <h2 class="slide-title">Spin Up NexusFlow</h2>
+                                <p class="slide-subtitle">Ready for production out-of-the-box</p>
+                            </div>
+                            <p>
+                                NexusFlow ships pre-configured with a complete Docker Compose environment. Launching the backend, database, vector stores, cache, and telemetry requires only one command.
+                            </p>
+                            <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 6px; font-family: var(--font-mono); font-size: 13px; color: var(--success); border: 1px solid var(--border-color); margin-bottom: 24px;">
+                                docker compose up --build -d
+                            </div>
+                            <p>
+                                Read our full documentation in the project README, or launch the UI dashboard locally to start executing safe, cached, multi-agent workflows.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="controls-nav">
+                <button class="nav-btn" onclick="prevSlide()" id="prev-btn" aria-label="Previous Slide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <div class="slide-progress" id="slide-dots">
+                    <div class="progress-dot active" onclick="goToSlide(1)"></div>
+                    <div class="progress-dot" onclick="goToSlide(2)"></div>
+                    <div class="progress-dot" onclick="goToSlide(3)"></div>
+                    <div class="progress-dot" onclick="goToSlide(4)"></div>
+                    <div class="progress-dot" onclick="goToSlide(5)"></div>
+                    <div class="progress-dot" onclick="goToSlide(6)"></div>
+                    <div class="progress-dot" onclick="goToSlide(7)"></div>
+                    <div class="progress-dot" onclick="goToSlide(8)"></div>
+                    <div class="progress-dot" onclick="goToSlide(9)"></div>
+                    <div class="progress-dot" onclick="goToSlide(10)"></div>
+                </div>
+                <button class="nav-btn" onclick="nextSlide()" id="next-btn" aria-label="Next Slide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
+            <div class="controls-right">
+                <div class="kbd-guide">
+                    Navigate: <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Presentation Engine JS -->
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 10;
+        const slideWrapper = document.getElementById('slides-wrapper');
+        const dots = document.querySelectorAll('.progress-dot');
+        const slideNumIndicator = document.getElementById('current-slide-num');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Initial setup
+        updateControls();
+
+        function goToSlide(n) {
+            if (n < 1 || n > totalSlides) return;
+            
+            const currentSlideEl = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+            const targetSlideEl = document.querySelector(`.slide[data-slide="${n}"]`);
+            
+            if (currentSlideEl) {
+                currentSlideEl.classList.remove('active');
+                if (n > currentSlide) {
+                    currentSlideEl.classList.add('past');
+                    currentSlideEl.classList.remove('future');
+                } else {
+                    currentSlideEl.classList.add('future');
+                    currentSlideEl.classList.remove('past');
+                }
+            }
+
+            if (targetSlideEl) {
+                targetSlideEl.classList.remove('past', 'future');
+                targetSlideEl.classList.add('active');
+            }
+
+            currentSlide = n;
+            updateControls();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        function updateControls() {
+            // Update slide number text
+            const formattedCurrent = String(currentSlide).padStart(2, '0');
+            const formattedTotal = String(totalSlides).padStart(2, '0');
+            slideNumIndicator.textContent = `${formattedCurrent} / ${formattedTotal}`;
+
+            // Update disabled status of buttons
+            prevBtn.disabled = (currentSlide === 1);
+            nextBtn.disabled = (currentSlide === totalSlides);
+
+            // Update dot indicators
+            dots.forEach((dot, index) => {
+                if (index === currentSlide - 1) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+                e.preventDefault();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+                e.preventDefault();
+            }
+        });
+
+        // Touch Swipe Controls for Mobile/Tablet
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchendX < touchstartX - 50) {
+                nextSlide(); // Swipe Left -> Next Slide
+            }
+            if (touchendX > touchstartX + 50) {
+                prevSlide(); // Swipe Right -> Prev Slide
+            }
+        }
+
+        // Slide 4: Interactive Graph Node Switcher Data
+        const agentData = {
+            planner: {
+                title: "Planner Agent",
+                type: "ORCHESTRATION NODE",
+                desc: "Analyzes incoming user queries, maps dependencies, and generates a step-by-step execution plan. It checks semantic conditions and decides whether context retrieval via RAG or tool executions are required to answer the query.",
+                schema: `{
+  "plan_steps": [
+    "Execute RAG query on tenant context",
+    "Run python calculations on response values",
+    "Validate final numbers against compliance guidelines"
+  ],
+  "requires_rag": true,
+  "assigned_tools": ["python_executor", "sql_runner"]
+}`
+            },
+            retriever: {
+                title: "Retriever Agent (RAG)",
+                type: "DATA RETRIEVAL NODE",
+                desc: "Invokes collection searches on ChromaDB database. Programmatically forces a user_id filter based on JWT authentication details, strictly separating files between tenants. Standard users can never access or query other accounts' files.",
+                schema: `{
+  "query_embeddings": [0.012, -0.045, 0.231, ...],
+  "where_clause": {
+    "user_id": "usr_9f82k30h4"
+  },
+  "retrieved_documents_count": 4
+}`
+            },
+            researcher: {
+                title: "Researcher Agent",
+                type: "CONTEXT COMPILATION NODE",
+                desc: "Receives raw document text chunks fetched by the retriever. Cleans formatting, parses structured tables, filters duplicate passages, and synthesizes information into highly condensed context prompts ready for the Reasoner.",
+                schema: `{
+  "synthesized_context": "Company total profit in Q3 2025 was $4.1M...",
+  "citations": [
+    {"doc_id": "file_01", "page": 4}
+  ]
+}`
+            },
+            tool: {
+                title: "Tool Execution Agent",
+                type: "UTILITY RUNTIME NODE",
+                desc: "Executes targeted sandbox calls. Employs security controls: a sandboxed Python runtime utilizing AST verification, a read-only SQL execution client with database binding, and verified REST queries. Returns structured outputs directly to the Reasoner.",
+                schema: `{
+  "tool_name": "python_executor",
+  "execution_result": "Success",
+  "output": "42.0",
+  "execution_time_ms": 12.4
+}`
+            },
+            reasoner: {
+                title: "Reasoner Agent",
+                type: "COGNITIVE SYNTHESIS NODE",
+                desc: "Fuses compiled document research, custom tool execution payloads, and the initial Planner schema instructions. Synthesizes a structured answer, builds citations, and frames consulting-grade recommendations.",
+                schema: `{
+  "draft_answer": "According to the uploaded documents and SQL runs...",
+  "confidence_score": 0.94,
+  "requires_validation": true
+}`
+            },
+            validator: {
+                title: "Validator Agent (Loop)",
+                type: "GUARDRAIL & COMPLIANCE NODE",
+                desc: "Inspects Reasoner drafts for compliance errors or LLM hallucinations. Validates context alignment. If compliance is violated or hallucination is detected, it flags failures and loops the query back to the Planner for correction.",
+                schema: `{
+  "hallucination_check": "Pass",
+  "compliance_check": "Pass",
+  "schema_validated": true,
+  "route_action": "respond" // Or "replanner" on failure
+}`
+            },
+            responder: {
+                title: "Response Agent",
+                type: "OUTPUT FORMATTER NODE",
+                desc: "Accepts approved reasoning output. Cleans operational traces, extracts clean JSON schemas, and structures results to display citations, token consumption summaries, estimated execution costs, and action items in the UI dashboard.",
+                schema: `{
+  "answer": "Q3 Profit margin is 18.4%...",
+  "citations": ["finance_report_q3.pdf#page=12"],
+  "token_metrics": {
+    "prompt_tokens": 1420,
+    "completion_tokens": 310
+  },
+  "execution_cost_usd": 0.0001995
+}`
+            }
+        };
+
+        function selectNode(nodeId) {
+            // Remove active classes from nodes
+            document.querySelectorAll('.graph-node').forEach(node => {
+                node.classList.remove('active-node');
+            });
+            // Add active class to clicked node
+            const activeNode = document.getElementById(`node-${nodeId}`);
+            if (activeNode) activeNode.classList.add('active-node');
+
+            // Highlight arrows matching selected flows
+            highlightArrows(nodeId);
+
+            // Update detail panel
+            const data = agentData[nodeId];
+            if (data) {
+                document.getElementById('agent-title').textContent = data.title;
+                document.getElementById('agent-type').textContent = data.type;
+                document.getElementById('agent-desc').textContent = data.desc;
+                document.getElementById('agent-schema').textContent = data.schema;
+            }
+        }
+
+        function highlightArrows(nodeId) {
+            // Reset all arrows
+            document.querySelectorAll('.svg-arrow').forEach(arrow => {
+                arrow.classList.remove('highlighted');
+            });
+
+            // Highlight path based on selected node
+            if (nodeId === 'planner') {
+                document.getElementById('arrow-1').classList.add('highlighted');
+                document.getElementById('arrow-4').classList.add('highlighted');
+            } else if (nodeId === 'retriever') {
+                document.getElementById('arrow-1').classList.add('highlighted');
+                document.getElementById('arrow-2').classList.add('highlighted');
+            } else if (nodeId === 'researcher') {
+                document.getElementById('arrow-2').classList.add('highlighted');
+                document.getElementById('arrow-3').classList.add('highlighted');
+            } else if (nodeId === 'tool') {
+                document.getElementById('arrow-4').classList.add('highlighted');
+                document.getElementById('arrow-5').classList.add('highlighted');
+            } else if (nodeId === 'reasoner') {
+                document.getElementById('arrow-5').classList.add('highlighted');
+                document.getElementById('arrow-6').classList.add('highlighted');
+            } else if (nodeId === 'validator') {
+                document.getElementById('arrow-3').classList.add('highlighted');
+                document.getElementById('arrow-6').classList.add('highlighted');
+                document.getElementById('arrow-7').classList.add('highlighted'); // Loop path
+            } else if (nodeId === 'responder') {
+                document.getElementById('arrow-3').classList.add('highlighted');
+                document.getElementById('arrow-6').classList.add('highlighted');
+            }
+        }
+
+        // Slide 7: Interactive Semantic Caching Simulator
+        function simulateCache(isHit) {
+            const outputPanel = document.getElementById('sim-output');
+            const latencyVal = document.getElementById('sim-latency');
+            const costVal = document.getElementById('sim-cost');
+            const sourceVal = document.getElementById('sim-source');
+            const explVal = document.getElementById('sim-explanation');
+
+            // Apply pulse effect
+            outputPanel.classList.add('pulse-element');
+            setTimeout(() => outputPanel.classList.remove('pulse-element'), 1000);
+
+            if (isHit) {
+                latencyVal.textContent = "38 ms";
+                latencyVal.className = "sim-stat-val color-success";
+                costVal.textContent = "$0.00000";
+                costVal.className = "sim-stat-val color-success";
+                sourceVal.textContent = "CACHE";
+                sourceVal.className = "sim-stat-val color-success";
+                explVal.innerHTML = `
+                    <strong>Semantic Cache Hit!</strong>
+                    <br>NexusFlow evaluated the incoming query's embedding vector and detected a cosine distance of <strong>0.09</strong> (threshold &lt; 0.15) matching a previously answered question.
+                    <ul>
+                        <li>LLM API call bypassed entirely</li>
+                        <li>Response resolved in under 40 milliseconds</li>
+                        <li>Platform token billing contribution is absolute zero</li>
+                    </ul>
+                `;
+            } else {
+                latencyVal.textContent = "3,420 ms";
+                latencyVal.className = "sim-stat-val color-danger";
+                costVal.textContent = "$0.01254";
+                costVal.className = "sim-stat-val color-danger";
+                sourceVal.textContent = "GEMINI-LLM";
+                sourceVal.className = "sim-stat-val color-accent";
+                explVal.innerHTML = `
+                    <strong>Semantic Cache Miss!</strong>
+                    <br>The query was not found in the local vector cache collection. A full agent execution cycle was run.
+                    <ul>
+                        <li>Planner constructed an execution strategy</li>
+                        <li>ChromaDB loaded isolated user RAG chunks</li>
+                        <li>Gemini-2.0-Flash model processed 6,420 prompt tokens and generated 410 response tokens</li>
+                        <li>The finalized answer was saved to the vector cache database for future hits</li>
+                    </ul>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

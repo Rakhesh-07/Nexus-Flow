@@ -1,0 +1,27 @@
+# AIFlow Corp - Employee Handbook & Company Policies
+
+## Section 1: Work Schedule & Attendance
+Our standard working hours are from 9:00 AM to 5:00 PM in the employee's local timezone. AIFlow Corp operates on a hybrid model where employees are expected to spend at least 2 days a week in their designated regional office, and can work remotely for the remaining 3 days.
+
+---
+
+## Section 2: Paid Time Off (PTO) & Leave Policies
+1. **Annual Vacation Allowance**:
+   * All full-time employees receive a base of 25 paid vacation days per calendar year.
+   * Unused vacation days (up to 5 days) can be rolled over to the next calendar year, but must be utilized before March 31st of the new year.
+2. **Sick Leave**:
+   * Employees are allocated 10 paid sick leave days per year for personal recovery or to care for immediate family members.
+3. **Parental Leave**:
+   * AIFlow Corp offers up to 16 weeks of fully paid parental leave for primary caregivers following the birth or adoption of a child, and 6 weeks for secondary caregivers.
+
+---
+
+## Section 3: Professional Development & Training Reimbursement
+* **Education Budget**: AIFlow Corp encourages lifelong learning. Employees can claim reimbursement of up to $2,500 per calendar year for technical certifications, academic courses, books, or professional conferences.
+* **Review Process**: Claims must be submitted via the HR Portal with receipt attachments and approved by the department manager before payment is disbursed.
+
+---
+
+## Section 4: Data Security & Acceptable Use
+* **Passphrases**: Employee workstation passphrases must contain at least 14 characters, combining uppercase, lowercase, numbers, and special characters. Workstations must be locked when leaving desk space.
+* **Remote VPN**: Accessing core staging/production environments requires multi-factor authentication (MFA) via the corporate VPN tunnel. Usage of unsecured public Wi-Fi without VPN is strictly prohibited.
