@@ -125,14 +125,12 @@ backend/
 
 ---
 
-## Setup & Run Local Services
+## How to Run & Deployment Options
 
-### Prerequisites
-*   Python 3.11 / 3.13
-*   Docker & Docker Compose
+NexusFlow supports two execution modes: **Production Docker Containers** and **Rapid Local Development**.
 
-### 1. Configure Environment Variables
-Create a `.env` file in the `backend/` directory:
+### Environment Configuration
+Before running either method, create a `.env` file in the `backend/` directory:
 ```env
 DATABASE_URL=sqlite:///./aiflow.db
 REDIS_URL=redis://localhost:6379/0
@@ -144,25 +142,53 @@ GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 EMBEDDING_PROVIDER=local # Toggle: local / gemini
 ```
 
-### 2. Reset Database & Seed Corporate Accounts
-Run the seed script locally to recreate database tables, seed the 33 corporate role accounts, and index 24 department documents:
-```bash
-cd backend
-python seed.py
-```
-> [NOTE]
-> All seeded accounts share the universal password: `Password123!` (e.g. `finance.manager@nexusflow.ai`, `eng.employee@nexusflow.ai`, `admin@nexusflow.ai`). Refer to [corporate_credentials.md](./corporate_credentials.md) for the complete list.
+---
 
-### 3. Run Backend Locally
+### Option A: Production Deployment (Docker Containers)
+Recommended for server deployments (AWS ECS, Kubernetes, GCP Cloud Run, Docker Host) or complete microservices stack testing.
+
 ```bash
-# Install requirements
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Build and launch Docker services (PostgreSQL 15, Redis 7, Prometheus, Grafana, FastAPI)
+docker compose up --build -d
+```
+
+Once running:
+* **FastAPI Application UI:** `http://localhost:8000/ui/`
+* **Swagger API Specs:** `http://localhost:8000/docs`
+* **Prometheus Metrics:** `http://localhost:9090`
+* **Grafana Dashboard:** `http://localhost:3000` (Default login: `admin` / `admin`)
+
+To stop containers:
+```bash
+docker compose down
+```
+
+---
+
+### Option B: Rapid Local Development (Direct Python)
+Recommended for local code iterations, debugging, and running Pytest suites without rebuilding containers.
+
+```bash
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Install Python dependencies
 pip install -r requirements.txt
 
-# Start local server
+# 3. Reset database & seed corporate accounts + 24 department files
+python seed.py
+
+# 4. Start local development server with hot-reload
 python main.py
 ```
-*   **FastAPI Dashboard UI:** `http://localhost:8000/ui/`
-*   **Swagger API Specs:** `http://localhost:8000/docs`
+> [!NOTE]
+> All 33 pre-seeded corporate accounts share the universal password: `Password123!`. Refer to [corporate_credentials.md](./corporate_credentials.md) for the complete credentials directory.
+
+* **FastAPI Application UI:** `http://localhost:8000/ui/`
+* **Swagger API Specs:** `http://localhost:8000/docs`
 
 ---
 
