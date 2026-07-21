@@ -22,6 +22,7 @@ aiflow_backend.log
 
 # User Uploaded Ingestion Files
 backend/uploads/
+uploads/
 
 # Virtual Environments
 venv/
@@ -44,9 +45,6 @@ backend/__pycache__/
 backend/.pytest_cache/
 .coverage
 htmlcov/
-
-# Specification Files (Requested to exclude)
-AIFlow_Enterprise_MultiAgent_AI_Workflow_Orchestrator.md
 
 # Operating System & IDE Files
 .DS_Store

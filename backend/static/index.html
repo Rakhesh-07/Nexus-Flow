@@ -3,62 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIFlow - Enterprise Multi-Agent Workflow Orchestrator</title>
+    <title>NexusFlow - Enterprise Multi-Agent AI Workflow Orchestrator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Background grid effect -->
     <div class="grid-overlay"></div>
 
-    <!-- MAIN CONTAINER -->
     <div id="app">
         <!-- AUTH VIEW (Register / Login) -->
         <div id="auth-view" class="auth-container card">
             <div class="auth-header">
-                <h2>AIFlow</h2>
-                <p>Enterprise Multi-Agent Workflow Orchestrator</p>
+                <h2>NexusFlow</h2>
+                <p>Enterprise Role-Based AI Workflow Platform</p>
             </div>
             
-            <!-- Tabs -->
             <div class="auth-tabs">
                 <button id="tab-login-btn" class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
-                <button id="tab-register-btn" class="auth-tab" onclick="switchAuthTab('register')">Register</button>
+                <button id="tab-register-btn" class="auth-tab" onclick="switchAuthTab('register')">Register Account</button>
             </div>
 
             <!-- Login Form -->
             <form id="login-form" onsubmit="handleLogin(event)" autocomplete="off">
                 <div class="form-group">
-                    <label for="login-username">Username</label>
-                    <input type="text" id="login-username" placeholder="Enter username" required autocomplete="off">
+                    <label for="login-username">Work Email / Username</label>
+                    <input type="text" id="login-username" placeholder="e.g. finance.manager@nexusflow.ai" required autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label for="login-password">Password</label>
                     <input type="password" id="login-password" placeholder="Enter password" required autocomplete="new-password">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Authenticate</button>
+                <button type="submit" class="btn btn-primary btn-block">Authenticate Session</button>
             </form>
 
-            <!-- Register Form -->
+            <!-- Register Form with Department & Role Selectors -->
             <form id="register-form" class="hidden" onsubmit="handleRegister(event)" autocomplete="off">
                 <div class="form-group">
-                    <label for="register-username">Username</label>
-                    <input type="text" id="register-username" placeholder="Choose username" required autocomplete="off">
+                    <label for="register-username">Work Email / Username</label>
+                    <input type="text" id="register-username" placeholder="e.g. employee@nexusflow.ai" required autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label for="register-password">Password</label>
-                    <input type="password" id="register-password" placeholder="Choose password (min 6 chars)" required autocomplete="new-password">
+                    <input type="password" id="register-password" placeholder="Min 6 characters" required autocomplete="new-password">
                 </div>
                 <div class="form-group">
-                    <label for="register-role">Default Access Role</label>
-                    <select id="register-role">
-                        <option value="user">Standard User</option>
-                        <option value="admin">Admin / Manager</option>
+                    <label for="register-department">Department</label>
+                    <select id="register-department" required>
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Engineering" selected>Engineering</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Marketing">Marketing</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+                <div class="form-group">
+                    <label for="register-role">Corporate Role</label>
+                    <select id="register-role" required>
+                        <option value="employee" selected>Employee (Standard Upload & Query)</option>
+                        <option value="team_lead">Team Lead (Team Upload & Approval)</option>
+                        <option value="department_manager">Department Manager (Dept Approval & Audit)</option>
+                        <option value="super_admin">Super Admin (Full Access)</option>
+                        <option value="guest">Guest (Read-Only Public Access)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create Enterprise Account</button>
             </form>
 
             <div id="auth-error" class="error-msg hidden"></div>
@@ -69,19 +82,37 @@
             <!-- Sidebar -->
             <aside class="sidebar">
                 <div class="sidebar-brand">
-                    <h3>AIFlow</h3>
-                    <span id="user-role-badge" class="badge badge-user">User</span>
+                    <h3>NexusFlow</h3>
+                    <div class="badge-group">
+                        <span id="user-role-badge" class="badge badge-user">Role</span>
+                        <span id="user-dept-badge" class="badge badge-dept">Department</span>
+                    </div>
                 </div>
                 
                 <nav class="sidebar-menu">
-                    <button class="nav-item active" onclick="switchView('chat')">
+                    <button id="nav-chat" class="nav-item active" onclick="switchView('chat')">
                         <span class="icon">💬</span> Chat Swarm
                     </button>
-                    <button class="nav-item" onclick="switchView('upload')">
-                        <span class="icon">📁</span> Ingest Documents
+                    <button id="nav-documents" class="nav-item" onclick="switchView('documents')">
+                        <span class="icon">📚</span> Document Library
                     </button>
-                    <button class="nav-item" onclick="switchView('analytics')">
+                    <button id="nav-upload" class="nav-item" onclick="switchView('upload')">
+                        <span class="icon">📤</span> Upload Document
+                    </button>
+                    <button id="nav-pending" class="nav-item hidden" onclick="switchView('pending')">
+                        <span class="icon">⏳</span> Pending Approvals
+                    </button>
+                    <button id="nav-profile" class="nav-item" onclick="switchView('profile')">
+                        <span class="icon">⚙️</span> My Profile & Security
+                    </button>
+                    <button id="nav-analytics" class="nav-item" onclick="switchView('analytics')">
                         <span class="icon">📊</span> Usage Analytics
+                    </button>
+                    <button id="nav-audit" class="nav-item hidden" onclick="switchView('audit')">
+                        <span class="icon">🛡️</span> Audit Logs
+                    </button>
+                    <button id="nav-admin" class="nav-item hidden" onclick="switchView('admin-dashboard')">
+                        <span class="icon">⚡</span> Admin Dashboard
                     </button>
                 </nav>
 
@@ -90,7 +121,7 @@
                         <div class="user-avatar">👤</div>
                         <div class="user-info">
                             <span id="current-username" class="username">Guest</span>
-                            <span class="status-online">Online</span>
+                            <span id="current-clearance" class="clearance-tag">INTERNAL</span>
                         </div>
                     </div>
                     <button class="btn btn-secondary btn-block btn-logout" onclick="handleLogout()">Logout</button>
@@ -102,59 +133,192 @@
                 <!-- CHAT MODULE -->
                 <section id="chat-section" class="content-section">
                     <div class="section-header">
-                        <h2>Chat Swarm</h2>
-                        <p>Ask questions. The orchestrator will dynamically route, retrieve, and validator outputs.</p>
+                        <h2>Multi-Agent AI Chat Swarm</h2>
+                        <p>Ask questions. Vector RAG is strictly isolated by Department & Clearance level.</p>
                     </div>
 
                     <div class="chat-container card">
                         <div id="chat-messages" class="chat-messages-area">
                             <div class="system-message">
-                                <p>Welcome to AIFlow Swarm. Ask questions about your ingested RAG documents, run queries, or execute math calculations.</p>
+                                <p>Welcome to NexusFlow. Ask questions about your authorized department documents.</p>
                             </div>
                         </div>
                         
                         <div class="chat-input-area">
                             <form id="chat-form" onsubmit="handleSendMessage(event)">
-                                <input type="text" id="chat-input" placeholder="Ask AIFlow orchestrator..." required autocomplete="off">
+                                <input type="text" id="chat-input" placeholder="Query authorized knowledge base..." required autocomplete="off">
                                 <button type="submit" class="btn btn-primary">Send</button>
                             </form>
                         </div>
                     </div>
                 </section>
 
-                <!-- INGEST UPLOAD MODULE -->
+                <!-- ACCESS-CONTROLLED DOCUMENT LIBRARY MODULE -->
+                <section id="documents-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>Authorized Document Library</h2>
+                        <p>View documents accessible under your Department and Security Clearance Level.</p>
+                    </div>
+
+                    <div class="table-container card">
+                        <h3>Accessible Department Documents</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Filename</th>
+                                    <th>Department</th>
+                                    <th>Classification</th>
+                                    <th>Visibility</th>
+                                    <th>Owner</th>
+                                    <th>Approval Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="documents-tbody">
+                                <tr>
+                                    <td colspan="7" class="text-center">Loading document library...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- INGEST UPLOAD MODULE WITH METADATA SELECTORS -->
                 <section id="upload-section" class="content-section hidden">
                     <div class="section-header">
-                        <h2>Ingest Documents</h2>
-                        <p>Upload files to parse, chunk, and embed them into the multi-tenant Vector Database.</p>
+                        <h2>Upload & Ingest Document</h2>
+                        <p>Upload document with Department, Classification, and Visibility parameters.</p>
                     </div>
 
                     <div class="upload-container card">
-                        <div class="drag-drop-zone" id="drop-zone" onclick="triggerFileSelect()">
-                            <span class="upload-icon">📤</span>
-                            <p>Drag and drop multiple text/PDF/markdown documents here</p>
-                            <span class="btn btn-secondary">Select Files</span>
-                            <input type="file" id="file-input" multiple class="hidden" onchange="handleFileSelect(event)">
-                        </div>
-
-                        <!-- Upload File Queue -->
-                        <div id="file-queue-container" class="file-queue-container hidden">
-                            <h4>Selected Files Queue</h4>
-                            <div id="file-list" class="file-list"></div>
-                            
-                            <div class="upload-actions">
-                                <button class="btn btn-primary" onclick="uploadQueuedFiles()">Ingest Files</button>
-                                <button class="btn btn-secondary" onclick="clearFileQueue()">Clear Queue</button>
+                        <form id="upload-form" onsubmit="handleUploadSubmit(event)">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="upload-department">Target Department</label>
+                                    <select id="upload-department" required>
+                                        <option value="Human Resources">Human Resources</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="Legal">Legal</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Information Technology">Information Technology</option>
+                                        <option value="Operations">Operations</option>
+                                        <option value="Sales">Sales</option>
+                                        <option value="Marketing">Marketing</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="upload-classification">Classification Level</label>
+                                    <select id="upload-classification" required>
+                                        <option value="PUBLIC">PUBLIC (All users)</option>
+                                        <option value="INTERNAL" selected>INTERNAL (Employees & above)</option>
+                                        <option value="CONFIDENTIAL">CONFIDENTIAL (Team Lead & above)</option>
+                                        <option value="RESTRICTED">RESTRICTED (Managers & Admin)</option>
+                                        <option value="HIGHLY_CONFIDENTIAL">HIGHLY CONFIDENTIAL (Super Admin)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="upload-visibility">Visibility Scope</label>
+                                    <select id="upload-visibility" required>
+                                        <option value="Department" selected>Department Scope</option>
+                                        <option value="Team">Team Scope</option>
+                                        <option value="Organization">Organization-Wide</option>
+                                        <option value="Private">Private (Owner Only)</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Confirmation & Progress Status -->
+                            <div class="drag-drop-zone" id="drop-zone" onclick="triggerFileSelect()">
+                                <span class="upload-icon">📤</span>
+                                <p>Click or Drag & Drop Document File (.pdf, .txt, .md)</p>
+                                <span id="selected-file-name" class="btn btn-secondary">Choose File</span>
+                                <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block style-upload-btn">Upload Document for Processing</button>
+                        </form>
+
                         <div id="upload-status" class="upload-status card hidden">
-                            <h4 id="status-heading">Processing Documents...</h4>
+                            <h4 id="status-heading">Ingesting Document...</h4>
                             <div class="progress-bar-container">
                                 <div id="status-progress-bar" class="progress-bar"></div>
                             </div>
                             <p id="status-details"></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PENDING APPROVALS MODULE -->
+                <section id="pending-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>Pending Document Approvals</h2>
+                        <p>Department Manager portal to review and approve uploaded employee files prior to RAG indexing.</p>
+                    </div>
+
+                    <div class="table-container card">
+                        <h3>Files Awaiting Department Approval</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Filename</th>
+                                    <th>Department</th>
+                                    <th>Classification</th>
+                                    <th>Uploaded By</th>
+                                    <th>Submitted At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pending-tbody">
+                                <tr>
+                                    <td colspan="7" class="text-center">No pending approvals found.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- MY PROFILE & PASSWORD RESET MODULE -->
+                <section id="profile-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>My Profile & Security Settings</h2>
+                        <p>Update your basic personal information and change your login password.</p>
+                    </div>
+
+                    <div class="profile-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+                        <!-- Self-Service Profile Form -->
+                        <div class="card" style="padding: 24px;">
+                            <h3>Edit Basic Information</h3>
+                            <form id="profile-form" onsubmit="handleUpdateProfile(event)">
+                                <div class="form-group">
+                                    <label for="profile-fullname">Full Name</label>
+                                    <input type="text" id="profile-fullname" placeholder="e.g. Jane Doe">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-email">Work Email</label>
+                                    <input type="email" id="profile-email" placeholder="e.g. jane.doe@nexusflow.ai">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-contact">Contact Details / Phone</label>
+                                    <input type="text" id="profile-contact" placeholder="e.g. +1 (555) 019-2834">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">Save Profile Details</button>
+                            </form>
+                        </div>
+
+                        <!-- Self-Service Password Reset Form -->
+                        <div class="card" style="padding: 24px;">
+                            <h3>Change Login Password</h3>
+                            <form id="password-form" onsubmit="handleChangePassword(event)">
+                                <div class="form-group">
+                                    <label for="pwd-current">Current Password</label>
+                                    <input type="password" id="pwd-current" required placeholder="Enter current password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pwd-new">New Password</label>
+                                    <input type="password" id="pwd-new" required minlength="6" placeholder="Enter new password (min 6 chars)">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">Update Password</button>
+                            </form>
                         </div>
                     </div>
                 </section>
@@ -166,9 +330,7 @@
                         <p>Monitor platform statistics, cost evaluations, and token consumption summaries.</p>
                     </div>
 
-                    <!-- USER ANALYTICS TAB -->
                     <div id="user-analytics" class="analytics-wrapper">
-                        <!-- Stats Grid -->
                         <div class="stats-grid">
                             <div class="stat-card card">
                                 <h3>Total Queries</h3>
@@ -184,9 +346,8 @@
                             </div>
                         </div>
 
-                        <!-- Personal Query History Table -->
                         <div class="table-container card">
-                            <h3>Query History Log</h3>
+                            <h3>Personal Query History Log</h3>
                             <table class="data-table">
                                 <thead>
                                     <tr>
@@ -205,56 +366,147 @@
                             </table>
                         </div>
                     </div>
+                </section>
 
-                    <!-- ADMIN / MANAGER ANALYTICS TAB -->
-                    <div id="admin-analytics" class="analytics-wrapper hidden">
-                        <div class="tab-divider">Admin Portal Overview</div>
-                        
-                        <!-- Global Stats Grid -->
-                        <div class="stats-grid">
-                            <div class="stat-card card">
-                                <h3>Global Queries Run</h3>
-                                <p id="admin-total-queries" class="stat-value">-</p>
-                            </div>
-                            <div class="stat-card card">
-                                <h3>Total Vector Files</h3>
-                                <p id="admin-total-documents" class="stat-value">-</p>
-                            </div>
-                            <div class="stat-card card">
-                                <h3>Cumulative Cost ($)</h3>
-                                <p id="admin-total-cost" class="stat-value" style="color: #00ff66;">$0.00</p>
-                            </div>
-                            <div class="stat-card card">
-                                <h3>Avg. Swarm Latency</h3>
-                                <p id="admin-avg-latency" class="stat-value">-</p>
-                            </div>
-                        </div>
+                <!-- AUDIT LOGS MODULE -->
+                <section id="audit-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>Security & Audit Trail Logs</h2>
+                        <p>Immutable audit logging tracking user authentication, authorization denials, uploads, approvals, and queries.</p>
+                    </div>
 
-                        <!-- User Breakdown Table -->
-                        <div class="table-container card">
-                            <h3>Platform Users Usage Summary</h3>
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>User ID</th>
-                                        <th>Username</th>
-                                        <th>Role</th>
-                                        <th>Queries Run</th>
-                                        <th>Files Uploaded</th>
-                                        <th>Total Tokens</th>
-                                        <th>Last Active</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-users-tbody">
-                                    <tr>
-                                        <td colspan="7" class="text-center">No user data retrieved.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="table-container card">
+                        <h3>System Security Audit Trail</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Department</th>
+                                    <th>Action</th>
+                                    <th>Target File</th>
+                                    <th>Status</th>
+                                    <th>IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-tbody">
+                                <tr>
+                                    <td colspan="7" class="text-center">Loading audit records...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ENTERPRISE ADMIN DASHBOARD MODULE -->
+                <section id="admin-dashboard-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>Enterprise Admin Dashboard</h2>
+                        <p>System-wide operational controls, user breakdown, and clearance distribution analytics.</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card card">
+                            <h3>Total Corporate Users</h3>
+                            <p id="admin-card-users" class="stat-value">-</p>
                         </div>
+                        <div class="stat-card card">
+                            <h3>Pending Approvals</h3>
+                            <p id="admin-card-pending" class="stat-value" style="color: #ffaa00;">-</p>
+                        </div>
+                        <div class="stat-card card">
+                            <h3>Restricted Documents</h3>
+                            <p id="admin-card-restricted" class="stat-value" style="color: #ff3366;">-</p>
+                        </div>
+                        <div class="stat-card card">
+                            <h3>Permission Denials</h3>
+                            <p id="admin-card-denials" class="stat-value" style="color: #ff0055;">-</p>
+                        </div>
+                    </div>
+
+                    <div class="table-container card">
+                        <h3>User Role & Employee Management (Higher Admin Only)</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Full Name / Email</th>
+                                    <th>Department</th>
+                                    <th>Role</th>
+                                    <th>Clearance</th>
+                                    <th>Status</th>
+                                    <th>Admin Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-mgmt-tbody">
+                                <tr>
+                                    <td colspan="8" class="text-center">Loading user records...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </main>
+        </div>
+    </div>
+
+    <!-- ADMIN EDIT EMPLOYEE MODAL -->
+    <div id="edit-user-modal" class="modal-backdrop hidden">
+        <div class="modal-content card" style="max-width: 500px; padding: 24px; margin: 50px auto;">
+            <h3>Edit Employee Account (Admin)</h3>
+            <form id="admin-edit-user-form" onsubmit="handleAdminUserSave(event)">
+                <input type="hidden" id="edit-user-id">
+                <div class="form-group">
+                    <label for="edit-username">Username / Email</label>
+                    <input type="text" id="edit-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-fullname">Full Name</label>
+                    <input type="text" id="edit-fullname">
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Contact Email</label>
+                    <input type="email" id="edit-email">
+                </div>
+                <div class="form-group">
+                    <label for="edit-department">Department</label>
+                    <select id="edit-department">
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Marketing">Marketing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-role">Corporate Role</label>
+                    <select id="edit-role">
+                        <option value="employee">Employee</option>
+                        <option value="team_lead">Team Lead</option>
+                        <option value="department_manager">Department Manager</option>
+                        <option value="super_admin">Super Admin</option>
+                        <option value="guest">Guest</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-clearance">Clearance Level</label>
+                    <select id="edit-clearance">
+                        <option value="PUBLIC">PUBLIC</option>
+                        <option value="INTERNAL">INTERNAL</option>
+                        <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+                        <option value="RESTRICTED">RESTRICTED</option>
+                        <option value="HIGHLY_CONFIDENTIAL">HIGHLY_CONFIDENTIAL</option>
+                    </select>
+                </div>
+                <div class="upload-actions" style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAdminEditModal()" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 

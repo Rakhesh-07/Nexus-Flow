@@ -75,15 +75,30 @@ def planner_node(state: AgentState) -> Dict[str, Any]:
 
 def retriever_node(state: AgentState) -> Dict[str, Any]:
     """
-    Retriever Agent: Performs semantic query search in ChromaDB.
+    Retriever Agent: Performs semantic query search in ChromaDB with enterprise RBAC metadata filtering.
     """
     logger.info("--- Entering Retriever Node ---")
     query = state["query"]
     user_id = state.get("user_id", 0)
+    user_department = state.get("user_department", "Engineering")
+    user_role = state.get("user_role", "employee")
+    user_clearance = state.get("user_clearance", "INTERNAL")
+
+    from database.models import User
+    from services.permission_service import PermissionService
+
+    temp_user = User(
+        id=user_id,
+        username=state.get("user_name", "user"),
+        department=user_department,
+        role=user_role,
+        clearance_level=user_clearance,
+        is_active=True
+    )
     
-    # Filter by user_id to ensure multitenant data isolation
-    filter_dict = {"user_id": user_id}
-    logger.info(f"Querying vector store for user_id={user_id} with query: {query}")
+    # Construct enterprise RBAC filter
+    filter_dict = PermissionService.build_chroma_filter(temp_user)
+    logger.info(f"Querying vector store for user_id={user_id} dept={user_department} role={user_role} filter={filter_dict}")
     
     results = chroma_service.query_similarity(query, limit=5, filter_dict=filter_dict)
     

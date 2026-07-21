@@ -103,6 +103,13 @@ input, select {
     transition: var(--transition);
 }
 
+select option {
+    background-color: #131520;
+    color: #ffffff;
+    padding: 10px;
+    font-size: 14px;
+}
+
 input:focus, select:focus {
     outline: none;
     border-color: var(--accent);
@@ -671,6 +678,109 @@ input:focus, select:focus {
     border-radius: 6px;
     font-size: 13px;
     text-align: center;
+}
+
+/* Enterprise RBAC Badges & Pills */
+.badge-group {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.badge-dept {
+    background: rgba(0, 102, 255, 0.15);
+    color: #66a3ff;
+    border: 1px solid rgba(0, 102, 255, 0.3);
+}
+
+.clearance-tag {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+}
+
+.class-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.class-PUBLIC {
+    background: rgba(0, 255, 102, 0.15);
+    color: #00ff66;
+    border: 1px solid rgba(0, 255, 102, 0.3);
+}
+
+.class-INTERNAL {
+    background: rgba(0, 102, 255, 0.15);
+    color: #3385ff;
+    border: 1px solid rgba(0, 102, 255, 0.3);
+}
+
+.class-CONFIDENTIAL {
+    background: rgba(255, 170, 0, 0.15);
+    color: #ffaa00;
+    border: 1px solid rgba(255, 170, 0, 0.3);
+}
+
+.class-RESTRICTED {
+    background: rgba(255, 51, 102, 0.15);
+    color: #ff3366;
+    border: 1px solid rgba(255, 51, 102, 0.3);
+}
+
+.class-HIGHLY_CONFIDENTIAL {
+    background: rgba(255, 0, 85, 0.25);
+    color: #ff0055;
+    border: 1px solid rgba(255, 0, 85, 0.5);
+    box-shadow: 0 0 8px rgba(255, 0, 85, 0.3);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.style-upload-btn {
+    margin-top: 20px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 11px;
+}
+
+.btn-danger {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+}
+
+.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.4);
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Animations */

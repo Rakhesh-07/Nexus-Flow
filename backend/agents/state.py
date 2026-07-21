@@ -28,8 +28,12 @@ class AgentState(TypedDict):
     query: str
     final_response: Optional[Dict[str, Any]]
     
-    # User ID to query records in Postgres/Chroma DB
+    # User details for enterprise RBAC and data isolation
     user_id: int
+    user_name: Optional[str]
+    user_department: Optional[str]
+    user_role: Optional[str]
+    user_clearance: Optional[str]
     
     # Planner decision
     plan: List[str]

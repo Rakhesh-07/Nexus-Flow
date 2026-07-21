@@ -1,6 +1,8 @@
 # NexusFlow -- Enterprise Multi-Agent AI Workflow Orchestrator
 
-NexusFlow is a production-grade enterprise AI orchestration platform inspired by corporate consulting workflows. It implements reusable backend services utilizing **FastAPI**, **LangGraph**, **ChromaDB** for RAG, **PostgreSQL** for persistence, **Redis** for caching, and **OpenTelemetry + Prometheus + Grafana** for monitoring and observability.
+NexusFlow is a production-grade enterprise AI orchestration platform inspired by corporate consulting workflows. It implements reusable backend services utilizing **FastAPI**, **LangGraph**, **ChromaDB** for RAG, **PostgreSQL** (or SQLite) for persistence, **Redis** for caching, and **OpenTelemetry + Prometheus + Grafana** for monitoring and observability.
+
+The platform is upgraded with **Enterprise Role-Based Access Control (RBAC)**, **Department-Based Document Isolation**, **Clearance Level Matrices**, **Document Approval Workflows**, **Self-Service Employee Settings**, **Admin Employee Control Panels**, and **Security Audit Logging**.
 
 ---
 
@@ -14,7 +16,7 @@ NexusFlow is a production-grade enterprise AI orchestration platform inspired by
                                     │
                 ┌───────────────────┴───────────────────┐
                 ▼                                       ▼
-          Redis Cache                           PostgreSQL (Auth & Trace DB)
+          Redis Cache                           PostgreSQL (Auth, Trace & Audit DB)
                 │                                       │
                 └───────────────────┬───────────────────┘
                                     │
@@ -26,15 +28,17 @@ NexusFlow is a production-grade enterprise AI orchestration platform inspired by
     ▼              ▼                   ▼                   ▼                ▼
 Planner   ──►  Retriever   ──►   Tool Agent   ──►       Reasoner  ──►   Validator
 Node           Node              Node                   Node            Node
-                   │                   │                                    │
-                   ▼                   ▼                                    ▼
-               ChromaDB          Tool Executions:                      (Hallucination
-              Vector DB          - Python, SQL, REST, Calc              & Compliance Check)
+               (RBAC Metadata                           (Math, SQL,     (Hallucination &
+                Pre-Filtering)                           REST, Python)   Compliance Check)
+                    │
+                    ▼
+                ChromaDB
+               Vector DB
 ```
 
 ### Multi-Agent Workflow State Machine
 1. **Planner Agent**: Analyzes user prompt and generates a step-by-step plan, deciding if RAG context retrieval is required.
-2. **Retriever Agent (RAG)**: Fetches relevant text chunks from the vector database using similarity searches (supporting tenant isolation via user ID).
+2. **Retriever Agent (RAG)**: Fetches relevant text chunks from the vector database using similarity searches (supporting strict department and clearance metadata pre-filtering).
 3. **Researcher Agent**: Synthesizes and condenses the raw retrieved passages into structured context.
 4. **Tool Agent**: Safely executes specialized tools (Python Code Execution, SQL Querying, REST HTTP calls, and Mathematical calculations) according to plan directives.
 5. **Reasoner Agent**: Integrates facts, tool results, and plan milestones to compose a comprehensive draft answer.
@@ -49,24 +53,26 @@ Node           Node              Node                   Node            Node
 backend/
 ├── api/
 │   ├── config.py           # Settings configuration loading from .env
-│   ├── deps.py             # Auth dependencies & Pydantic request models
-│   ├── endpoints.py        # REST API endpoints (register, upload, query, health, etc.)
-│   └── security.py         # Password hashing (bcrypt) & JWT generation
+│   ├── deps.py             # Auth dependencies, Pydantic request models & require_roles
+│   ├── endpoints.py        # REST API endpoints (register, upload, query, approvals, profile, etc.)
+│   └── security.py         # Password hashing (bcrypt) & JWT claims generation
 ├── database/
 │   ├── database.py         # SQLAlchemy connection engine
-│   └── models.py           # Tables for User, Document, Conversation, and Workflow
+│   └── models.py           # Tables for User, Document, AuditLog, Conversation, and Workflow
+├── services/
+│   └── permission_service.py # [NEW] Centralized Authorization Engine & Clearance matrices
 ├── agents/
 │   ├── graph.py            # LangGraph StateGraph compilation
-│   ├── nodes.py            # Individual node execution handlers
+│   ├── nodes.py            # Individual node execution handlers (RBAC Retriever filter integration)
 │   ├── providers.py        # Gemini 2.0 & Mock LLM providers
 │   └── state.py            # AgentState and output schemas
 ├── rag/
 │   ├── chroma_service.py   # Vector collection search, insert, and semantic caching
 │   └── document_processor.py # PDF/TXT file parser and chunk splitters
 ├── static/
-│   ├── index.html          # Dark Theme UI Dashboard
-│   ├── style.css           # Glowing glassmorphic styling
-│   └── app.js              # Frontend controller (Auth, Uploads, Chat, Analytics)
+│   ├── index.html          # Dark Theme UI Dashboard (forms for RBAC parameters)
+│   ├── style.css           # Glowing glassmorphic styling & classification pills
+│   └── app.js              # Frontend controller (Auth, Uploads, Chat, Profile, Approvals, Admin)
 ├── tools/
 │   ├── __init__.py         # Tools exports registry
 │   ├── base_tool.py        # Tool base definition class
@@ -91,49 +97,39 @@ backend/
 
 ## Key Features & Security Enhancements
 
-### 1. Professional Dark UI Dashboard (`/` & `/ui/`)
-* **Interactive Chat Swarm:** Send queries and watch real-time steps progress. Chat bubbles show formatted response answers, citations, execution times, and precise token calculations.
-* **Multi-File Uploader:** Drag-and-drop zone supporting bulk ingestion of `.pdf`, `.txt`, and `.md` documents, detailing file status and indexing completion confirmations.
+### 1. Enterprise Role-Based Access Control (RBAC) & Clearance Matrix
+*   **Security Clearance Levels (5):** `PUBLIC` (1) < `INTERNAL` (2) < `CONFIDENTIAL` (3) < `RESTRICTED` (4) < `HIGHLY_CONFIDENTIAL` (5).
+*   **Corporate Role Privileges (5):**
+    *   `super_admin`: Full clearance (`HIGHLY_CONFIDENTIAL`). Complete platform, audit, and user management.
+    *   `department_manager`: Clearance up to `RESTRICTED`. Approves department employee documents and manages department users.
+    *   `team_lead`: Clearance up to `CONFIDENTIAL`. Manages team uploads and approves team-level documents.
+    *   `employee`: Clearance up to `INTERNAL`. Can upload documents (requires approval) and run queries.
+    *   `guest`: Clearance limited to `PUBLIC`. Read-only access to public organization documents (cannot upload).
 
-### 2. Role-Based Usage Analytics
-* **Admins/Managers View:** Gain global visibility over system operations, displaying total queries, files ingested, average execution latencies, total token consumption, and estimated platform billing ($0.075/1M input, $0.30/1M output tokens). Includes an individual breakdown table showing every registered user's query count, token usage, and last-active timestamp.
-* **Standard Users View:** Private dashboard showing personal stats, queries executed, and a chronologically detailed personal query history table.
+### 2. Department-Based Document Isolation
+*   Vector similarity searches filter out unauthorized chunks *before* similarity score calculations based on the user's department, role clearance level, and the document's classification.
+*   If a search query fails to retrieve authorized documents, the system returns a secure fallback: `"No accessible documents found."` without revealing the existence of restricted documents.
 
-### 3. Industry-Level Security Implementations
-* **Multi-Tenant RAG Isolation:** All vector indexing and similarity searches filter strictly by the user's authenticated `user_id`. Users can never query or view files uploaded by other accounts.
-* **Secure Auth Gateway:** Implements JSON Web Tokens (JWT) for session management with hashing of passwords using `bcrypt` and salt factors.
-* **Auto-Fill & Credential Protection:** Forms use specific input configuration attributes (`autocomplete="off"` and `autocomplete="new-password"`) and programmatic DOM `.reset()` triggers on authentication events (logout, login, register) to prevent browser credential retention.
-* **SQL Injection & AST Sandboxing:** Safe querying via SQLAlchemy ORM parameterization and sandboxed Python AST code execution.
+### 3. Document Ingestion Approval Pipeline
+*   Documents uploaded by `employee` and `team_lead` users are flagged as `approved = False` (Pending Approval) and **are skipped from ChromaDB vector indexing**.
+*   Department Managers and Super Admins can review pending department uploads on their **Pending Approvals** dashboard and click **Approve** to extract text, chunk, and index them into ChromaDB.
 
-### 4. Low-Cost Semantic Caching
-* **Local Similarity Storage:** Utilizes local ChromaDB persistence collection `aiflow_cache` to store user queries and response payloads.
-* **Cosine Similarity Checks:** If a question matching a similarity distance `< 0.15` is submitted, it returns the cached response in **under 50ms at $0 cost**, bypassing LLM and agent runs.
-* **Mock-Aware Bypassing:** Integrated async-safe context variable indicators that prevent mocked/fallback outputs (e.g., when the key hits rate limits) from contaminating cache collections.
+### 4. Self-Service Settings & Profile Customizations
+*   Every user can manage their profile: edit **Full Name**, **Work Email**, **Contact Details**, and change their account **Password** directly from the portal.
 
-### 5. Gemini 2.0 & Schema Compliance
-* Pre-configured for `gemini-2.0-flash` models.
-* Strips invalid default schema fields recursively from Pydantic structures to avoid `Unknown field for Schema: default` errors on Google Generative Language API calls.
+### 5. Higher Administration Control Panel
+*   Only **Super Admins** and **Department Managers** can edit other employees' usernames, roles, department associations, clearance levels, active status, or delete employee accounts.
 
----
-
-## Technology Stack
-
-* **Language**: Python 3.11 / 3.13
-* **API Layer**: FastAPI
-* **Orchestration**: LangGraph
-* **Relational DB**: PostgreSQL / SQLite
-* **Caching**: Redis
-* **Vector DB**: ChromaDB
-* **Observability**: OpenTelemetry + Prometheus + Grafana
-* **Environment**: Docker & Docker Compose
+### 6. Immutable Security Audit Trail
+*   All user registrations, logins, file uploads, document approvals, deletion requests, and query executions are tracked in the database `AuditLog` table, complete with timestamps, statuses, and client IP addresses.
 
 ---
 
 ## Setup & Run Local Services
 
 ### Prerequisites
-* Python 3.11 / 3.13
-* Docker & Docker Compose
+*   Python 3.11 / 3.13
+*   Docker & Docker Compose
 
 ### 1. Configure Environment Variables
 Create a `.env` file in the `backend/` directory:
@@ -148,29 +144,25 @@ GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 EMBEDDING_PROVIDER=local # Toggle: local / gemini
 ```
 
-### 2. Standup Containers (Docker Compose)
-From the `backend/` directory, launch Postgres, Redis, Prometheus, Grafana, and AIFlow:
+### 2. Reset Database & Seed Corporate Accounts
+Run the seed script locally to recreate database tables, seed the 33 corporate role accounts, and index 24 department documents:
 ```bash
-docker compose up --build -d
+cd backend
+python seed.py
 ```
-Once run:
-* **FastAPI Server**: `http://localhost:8000` (UI Dashboard at `http://localhost:8000/ui/`)
-* **Prometheus Dashboard**: `http://localhost:9090`
-* **Grafana Dashboard**: `http://localhost:3000` (Default credentials: `admin` / `admin`)
+> [NOTE]
+> All seeded accounts share the universal password: `Password123!` (e.g. `finance.manager@nexusflow.ai`, `eng.employee@nexusflow.ai`, `admin@nexusflow.ai`). Refer to [corporate_credentials.md](./corporate_credentials.md) for the complete list.
 
-### 3. Run Backend Locally (Without Containers)
-To develop and run Python code directly:
+### 3. Run Backend Locally
 ```bash
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate # On Windows: venv\Scripts\activate
-
 # Install requirements
 pip install -r requirements.txt
 
-# Start local dev server
+# Start local server
 python main.py
 ```
+*   **FastAPI Dashboard UI:** `http://localhost:8000/ui/`
+*   **Swagger API Specs:** `http://localhost:8000/docs`
 
 ---
 

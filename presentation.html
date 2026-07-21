@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NexusFlow - Enterprise Multi-Agent AI Workflow Orchestrator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-primary: #0b0c10;
@@ -14,22 +17,22 @@
             --card-bg: rgba(20, 22, 34, 0.65);
             --border-color: rgba(255, 255, 255, 0.06);
             --border-glow: rgba(0, 102, 255, 0.25);
-            
+
             --text-primary: #f3f4f6;
             --text-secondary: #9ca3af;
             --text-muted: #6b7280;
-            
+
             --accent: #0066ff;
             --accent-glow: rgba(0, 102, 255, 0.4);
             --success: #00ff66;
             --success-glow: rgba(0, 255, 102, 0.2);
             --warning: #f59e0b;
             --danger: #ef4444;
-            
+
             --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-display: 'Outfit', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
-            
+
             --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -71,7 +74,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.005) 1px, transparent 1px);
             background-size: 40px 40px;
@@ -146,7 +149,8 @@
             position: relative;
             overflow: hidden;
             width: 100%;
-            height: calc(100vh - 140px); /* header + footer */
+            height: calc(100vh - 140px);
+            /* header + footer */
         }
 
         .slide {
@@ -693,9 +697,17 @@
             font-weight: 600;
         }
 
-        .sim-stat-val.color-accent { color: var(--accent); }
-        .sim-stat-val.color-success { color: var(--success); }
-        .sim-stat-val.color-danger { color: var(--danger); }
+        .sim-stat-val.color-accent {
+            color: var(--accent);
+        }
+
+        .sim-stat-val.color-success {
+            color: var(--success);
+        }
+
+        .sim-stat-val.color-danger {
+            color: var(--danger);
+        }
 
         .sim-flow-desc {
             border-left: 2px solid rgba(255, 255, 255, 0.08);
@@ -871,9 +883,17 @@
 
         /* Animations */
         @keyframes pulse-glow {
-            0% { box-shadow: 0 0 15px rgba(0, 102, 255, 0.2); }
-            50% { box-shadow: 0 0 25px rgba(0, 102, 255, 0.4); }
-            100% { box-shadow: 0 0 15px rgba(0, 102, 255, 0.2); }
+            0% {
+                box-shadow: 0 0 15px rgba(0, 102, 255, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 25px rgba(0, 102, 255, 0.4);
+            }
+
+            100% {
+                box-shadow: 0 0 15px rgba(0, 102, 255, 0.2);
+            }
         }
 
         .pulse-element {
@@ -904,9 +924,17 @@
             margin-top: 4px;
         }
 
-        .stat-val-dashboard.color-accent { color: var(--accent); }
-        .stat-val-dashboard.color-success { color: var(--success); }
-        .stat-val-dashboard.color-warning { color: var(--warning); }
+        .stat-val-dashboard.color-accent {
+            color: var(--accent);
+        }
+
+        .stat-val-dashboard.color-success {
+            color: var(--success);
+        }
+
+        .stat-val-dashboard.color-warning {
+            color: var(--warning);
+        }
 
         .dashboard-table-preview {
             background: rgba(11, 12, 16, 0.85);
@@ -1019,12 +1047,14 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="screen-warning">
         <h2 style="font-family: var(--font-display); margin-bottom: 16px; color: var(--danger);">Screen Too Small</h2>
         <p style="color: var(--text-secondary); font-size: 14px; max-width: 400px; line-height: 1.5;">
-            NexusFlow presentation requires a larger screen size. Please maximize your window or view on a desktop device for the optimal experience.
+            NexusFlow presentation requires a larger screen size. Please maximize your window or view on a desktop
+            device for the optimal experience.
         </p>
     </div>
 
@@ -1033,7 +1063,7 @@
     <div class="grid-overlay"></div>
 
     <div class="presentation">
-        
+
         <!-- Header -->
         <header>
             <a href="#" class="header-logo">
@@ -1047,19 +1077,24 @@
 
         <!-- Slides Container -->
         <div class="slides-container" id="slides-wrapper">
-            
+
             <!-- Slide 1: Welcome Title -->
             <div class="slide welcome-slide active" data-slide="1">
                 <div class="slide-content title-slide">
                     <span class="badge-enterprise">Enterprise-Grade AI Stack</span>
                     <h1>NEXUSFLOW</h1>
                     <p>
-                        A production-grade, secure, multi-agent AI orchestration platform built for high-performance enterprise decision making, semantic query optimization, and strict multi-tenant isolation.
+                        A production-grade, secure, multi-agent AI orchestration platform built for high-performance
+                        enterprise decision making, semantic query optimization, and strict multi-tenant isolation.
                     </p>
                     <div>
                         <button class="start-btn pulse-element" onclick="nextSlide()">
                             Start Presentation
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -1076,22 +1111,26 @@
                         <div class="glass-card danger-card">
                             <span class="card-icon">⚠️</span>
                             <h3 class="card-title">Hallucination & Risk</h3>
-                            <p class="card-desc">LLMs lack standard guardrails out-of-the-box, outputting false code, erroneous SQL, or non-compliant corporate answers.</p>
+                            <p class="card-desc">LLMs lack standard guardrails out-of-the-box, outputting false code,
+                                erroneous SQL, or non-compliant corporate answers.</p>
                         </div>
                         <div class="glass-card danger-card">
                             <span class="card-icon">🔒</span>
                             <h3 class="card-title">Data Leakage</h3>
-                            <p class="card-desc">No built-in tenant partition. Uploaded business files are indexed globally, leaking proprietary IP between normal users.</p>
+                            <p class="card-desc">No built-in tenant partition. Uploaded business files are indexed
+                                globally, leaking proprietary IP between normal users.</p>
                         </div>
                         <div class="glass-card danger-card">
                             <span class="card-icon">💸</span>
                             <h3 class="card-title">Exploding Cost</h3>
-                            <p class="card-desc">Repeated queries traverse the full LLM context pipeline, consuming massive amounts of API tokens and driving up operational billing.</p>
+                            <p class="card-desc">Repeated queries traverse the full LLM context pipeline, consuming
+                                massive amounts of API tokens and driving up operational billing.</p>
                         </div>
                         <div class="glass-card danger-card">
                             <span class="card-icon">🕵️‍♂️</span>
                             <h3 class="card-title">Zero Observability</h3>
-                            <p class="card-desc">Standard endpoints act as 'black boxes'. No tracing, latency metrics, performance audit logging, or monitoring interfaces.</p>
+                            <p class="card-desc">Standard endpoints act as 'black boxes'. No tracing, latency metrics,
+                                performance audit logging, or monitoring interfaces.</p>
                         </div>
                     </div>
                 </div>
@@ -1108,25 +1147,31 @@
                         <div class="glass-card success-card">
                             <h3 class="card-title">LangGraph Multi-Agent Orchestration</h3>
                             <p class="card-desc">
-                                Deconstructs user requests into structural, state-driven workflow paths. Connects Planner, Retriever, Reasoner, and Validator agents into an iterative cycle to guarantee schema-compliance and fact-based accuracy.
+                                Deconstructs user requests into structural, state-driven workflow paths. Connects
+                                Planner, Retriever, Reasoner, and Validator agents into an iterative cycle to guarantee
+                                schema-compliance and fact-based accuracy.
                             </p>
                         </div>
                         <div class="glass-card success-card">
                             <h3 class="card-title">Strict Multi-Tenant RAG Isolation</h3>
                             <p class="card-desc">
-                                Secures files using JWT-authenticated session metadata. Enforces programmatic filters on vector database query retrievals so users can never search or access other accounts' files.
+                                Secures files using JWT-authenticated session metadata. Enforces programmatic filters on
+                                vector database query retrievals so users can never search or access other accounts'
+                                files.
                             </p>
                         </div>
                         <div class="glass-card success-card">
                             <h3 class="card-title">Sub-50ms Local Semantic Caching</h3>
                             <p class="card-desc">
-                                Leverages local vector comparisons to immediately resolve repeated or closely matching queries. Bypasses the LLM completely for cached hits, dropping costs to $0.
+                                Leverages local vector comparisons to immediately resolve repeated or closely matching
+                                queries. Bypasses the LLM completely for cached hits, dropping costs to $0.
                             </p>
                         </div>
                         <div class="glass-card success-card">
                             <h3 class="card-title">Sandboxed Execution & Observability</h3>
                             <p class="card-desc">
-                                Runs generated code via safe AST executors and read-only parameterized engines. Exposes full telemetry using OpenTelemetry, Prometheus, and Grafana.
+                                Runs generated code via safe AST executors and read-only parameterized engines. Exposes
+                                full telemetry using OpenTelemetry, Prometheus, and Grafana.
                             </p>
                         </div>
                     </div>
@@ -1138,15 +1183,17 @@
                 <div class="slide-content">
                     <div class="slide-title-group">
                         <h2 class="slide-title">LangGraph Swarm Engine</h2>
-                        <p class="slide-subtitle">Interactive: Click on any agent node to explore its role, prompt instructions, and outputs</p>
+                        <p class="slide-subtitle">Interactive: Click on any agent node to explore its role, prompt
+                            instructions, and outputs</p>
                     </div>
-                    
+
                     <div class="graph-explorer">
                         <!-- Left Side: Interactive SVG Graph Node Graph -->
                         <div class="graph-canvas">
                             <svg class="swarm-connections" viewBox="0 0 400 350">
                                 <defs>
-                                    <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="14" refY="3" orient="auto">
+                                    <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="14" refY="3"
+                                        orient="auto">
                                         <polygon points="0 0, 6 3, 0 6" fill="rgba(255, 255, 255, 0.15)"></polygon>
                                     </marker>
                                 </defs>
@@ -1157,31 +1204,38 @@
                                 <path id="arrow-4" class="svg-arrow" d="M 200,50 L 290,110"></path>
                                 <path id="arrow-5" class="svg-arrow" d="M 290,130 L 290,190"></path>
                                 <path id="arrow-6" class="svg-arrow" d="M 290,210 L 200,270"></path>
-                                <path id="arrow-7" class="svg-arrow" d="M 200,290 L 200,50" stroke-dasharray="4,4"></path> <!-- Loop back -->
+                                <path id="arrow-7" class="svg-arrow" d="M 200,290 L 200,50" stroke-dasharray="4,4">
+                                </path> <!-- Loop back -->
                             </svg>
-                            
+
                             <div class="graph-node-container">
                                 <!-- Planner Node -->
                                 <div class="node-row">
-                                    <div class="graph-node active-node" id="node-planner" onclick="selectNode('planner')">Planner Node</div>
+                                    <div class="graph-node active-node" id="node-planner"
+                                        onclick="selectNode('planner')">Planner Node</div>
                                 </div>
                                 <!-- Layer 2: Retriever & Tool Agent -->
                                 <div class="node-row">
-                                    <div class="graph-node" id="node-retriever" onclick="selectNode('retriever')">Retriever (RAG)</div>
+                                    <div class="graph-node" id="node-retriever" onclick="selectNode('retriever')">
+                                        Retriever (RAG)</div>
                                     <div class="graph-node" id="node-tool" onclick="selectNode('tool')">Tool Agent</div>
                                 </div>
                                 <!-- Layer 3: Researcher & Reasoner -->
                                 <div class="node-row">
-                                    <div class="graph-node" id="node-researcher" onclick="selectNode('researcher')">Researcher</div>
-                                    <div class="graph-node" id="node-reasoner" onclick="selectNode('reasoner')">Reasoner Node</div>
+                                    <div class="graph-node" id="node-researcher" onclick="selectNode('researcher')">
+                                        Researcher</div>
+                                    <div class="graph-node" id="node-reasoner" onclick="selectNode('reasoner')">Reasoner
+                                        Node</div>
                                 </div>
                                 <!-- Layer 4: Validator -->
                                 <div class="node-row">
-                                    <div class="graph-node warning-node" id="node-validator" onclick="selectNode('validator')">Validator (Loop)</div>
+                                    <div class="graph-node warning-node" id="node-validator"
+                                        onclick="selectNode('validator')">Validator (Loop)</div>
                                 </div>
                                 <!-- Layer 5: Response Agent -->
                                 <div class="node-row">
-                                    <div class="graph-node success-node" id="node-responder" onclick="selectNode('responder')">Response Node</div>
+                                    <div class="graph-node success-node" id="node-responder"
+                                        onclick="selectNode('responder')">Response Node</div>
                                 </div>
                             </div>
                         </div>
@@ -1195,7 +1249,9 @@
                             <div class="detail-body">
                                 <div class="detail-item">
                                     <div class="detail-item-title">Core Responsibility</div>
-                                    <p id="agent-desc">Analyzes incoming user prompts, maps dependencies, and generates a structured execution plan. Determines whether custom tools or external document contexts are required.</p>
+                                    <p id="agent-desc">Analyzes incoming user prompts, maps dependencies, and generates
+                                        a structured execution plan. Determines whether custom tools or external
+                                        document contexts are required.</p>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-item-title">Guaranteed Output Schema</div>
@@ -1216,35 +1272,40 @@
                 <div class="slide-content">
                     <div class="slide-title-group">
                         <h2 class="slide-title">Zero-Trust Tool Execution</h2>
-                        <p class="slide-subtitle">Safeguarding database nodes and internal systems from untrusted agent code</p>
+                        <p class="slide-subtitle">Safeguarding database nodes and internal systems from untrusted agent
+                            code</p>
                     </div>
                     <div class="cards-grid-4">
                         <div class="glass-card">
                             <span class="card-icon" style="color: #38bdf8;">🐍</span>
                             <h3 class="card-title">Python AST Sandbox</h3>
                             <p class="card-desc">
-                                Evaluates Python scripts dynamically. Parses variables through an Abstract Syntax Tree (AST) compiler, blocking `import`, file writes, and infinite loops prior to evaluation.
+                                Evaluates Python scripts dynamically. Parses variables through an Abstract Syntax Tree
+                                (AST) compiler, blocking `import`, file writes, and infinite loops prior to evaluation.
                             </p>
                         </div>
                         <div class="glass-card">
                             <span class="card-icon" style="color: #34d399;">🛢️</span>
                             <h3 class="card-title">Read-Only SQL Runner</h3>
                             <p class="card-desc">
-                                Inspects query statements. Enforces read-only permissions and binds execution variables, completely neutralizing SQL injections and database modification risks.
+                                Inspects query statements. Enforces read-only permissions and binds execution variables,
+                                completely neutralizing SQL injections and database modification risks.
                             </p>
                         </div>
                         <div class="glass-card">
                             <span class="card-icon" style="color: #a78bfa;">🌐</span>
                             <h3 class="card-title">Secure REST Client</h3>
                             <p class="card-desc">
-                                Employs custom HTTP request validation. Restricts outbound calls to approved domains and manages authorization keys securely, shielding local networks from SSRF attacks.
+                                Employs custom HTTP request validation. Restricts outbound calls to approved domains and
+                                manages authorization keys securely, shielding local networks from SSRF attacks.
                             </p>
                         </div>
                         <div class="glass-card">
                             <span class="card-icon" style="color: #f472b6;">🧮</span>
                             <h3 class="card-title">Safe Calculator</h3>
                             <p class="card-desc">
-                                Computes equations without utilizing python's dangerous `eval()`. Parses mathematical strings using a strict token analyzer to block remote script executions.
+                                Computes equations without utilizing python's dangerous `eval()`. Parses mathematical
+                                strings using a strict token analyzer to block remote script executions.
                             </p>
                         </div>
                     </div>
@@ -1257,31 +1318,44 @@
                     <div class="split-layout">
                         <div class="split-text">
                             <div class="slide-title-group" style="text-align: left; margin-bottom: 24px;">
-                                <h2 class="slide-title">Secure Multi-Tenant RAG</h2>
-                                <p class="slide-subtitle">Strict tenant boundary control at the data layer</p>
+                                <h2 class="slide-title">Enterprise RBAC & Department Isolation</h2>
+                                <p class="slide-subtitle">Strict tenant and department boundary control at the data
+                                    layer</p>
                             </div>
-                            <h3>Programmatic isolation</h3>
+                            <h3>Programmatic RAG pre-filtering</h3>
                             <p>
-                                NexusFlow features a secure ingestion framework that parses PDF, TXT, and Markdown files, chunks content, and generates vector representations with standard embeddings.
+                                NexusFlow features a secure ingestion framework that chunks content and generates vector
+                                representations with security metadata.
                             </p>
                             <p>
-                                Security is hardcoded into retrievals. All database similarity queries automatically inject JWT authenticated parameters: <code>where={"user_id": current_user.id}</code>.
+                                Security is hardcoded into retrievals. All database similarity queries automatically
+                                inject JWT authenticated claims, filtering by user department, role, and clearance
+                                level: <code>PUBLIC</code>, <code>INTERNAL</code>, <code>CONFIDENTIAL</code>,
+                                <code>RESTRICTED</code>, <code>HIGHLY_CONFIDENTIAL</code>.
                             </p>
                             <p style="color: var(--success); font-weight: 500;">
-                                Result: Standard users can never view, search, or leak data belonging to other corporate accounts.
+                                Result: Employees can never query, view, or leak data belonging to other departments or
+                                above their clearance level.
                             </p>
                         </div>
-                        
+
                         <div class="split-visual">
                             <div class="glass-card" style="width: 100%; border-color: rgba(0, 255, 102, 0.15);">
-                                <h4 style="font-family: var(--font-mono); font-size: 13px; color: var(--success); margin-bottom: 12px;">Query Assembly Verification</h4>
-                                <pre style="font-family: var(--font-mono); font-size: 11px; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 6px; color: #a7f3d0; line-height: 1.5; overflow-x: auto;">
+                                <h4
+                                    style="font-family: var(--font-mono); font-size: 13px; color: var(--success); margin-bottom: 12px;">
+                                    Query Assembly Verification</h4>
+                                <pre
+                                    style="font-family: var(--font-mono); font-size: 11px; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 6px; color: #a7f3d0; line-height: 1.5; overflow-x: auto;">
 # ChromaDB Isolated Retrieval API
 results = collection.query(
     query_embeddings=[query_vector],
     n_results=top_k,
     where={
-        "user_id": current_user.id # STRICT ISOLATION
+        "$and": [
+            {"approved": True},
+            {"department": current_user.department},
+            {"classification": {"$in": allowed_classifications}}
+        ]
     }
 )
 return results</pre>
@@ -1296,9 +1370,10 @@ return results</pre>
                 <div class="slide-content">
                     <div class="slide-title-group">
                         <h2 class="slide-title">Low-Cost Semantic Caching</h2>
-                        <p class="slide-subtitle">Interactive: Test the performance differences between a Cache Miss and a Cache Hit</p>
+                        <p class="slide-subtitle">Interactive: Test the performance differences between a Cache Miss and
+                            a Cache Hit</p>
                     </div>
-                    
+
                     <div class="cache-simulator">
                         <!-- Left Controls -->
                         <div class="simulator-control">
@@ -1318,7 +1393,8 @@ return results</pre>
                         <!-- Right Stats/Display -->
                         <div class="simulator-display" id="sim-output">
                             <div class="sim-results">
-                                <div style="font-family: var(--font-display); font-size: 18px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <div
+                                    style="font-family: var(--font-display); font-size: 18px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
                                     Cache Engine Output
                                 </div>
                                 <div class="sim-stat-row">
@@ -1351,23 +1427,27 @@ return results</pre>
                         <h2 class="slide-title">Observability & Admin Analytics</h2>
                         <p class="slide-subtitle">Granular performance charts and cost breakdowns</p>
                     </div>
-                    
+
                     <!-- Stats panel -->
                     <div class="stat-grid-dashboard">
                         <div class="stat-card-dashboard">
-                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Total Queries Run</div>
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Total
+                                Queries Run</div>
                             <div class="stat-val-dashboard color-accent">1,482</div>
                         </div>
                         <div class="stat-card-dashboard">
-                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Avg Agent Latency</div>
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Avg Agent
+                                Latency</div>
                             <div class="stat-val-dashboard">320ms</div>
                         </div>
                         <div class="stat-card-dashboard">
-                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Semantic Cache Hits</div>
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Semantic
+                                Cache Hits</div>
                             <div class="stat-val-dashboard color-success">64.2%</div>
                         </div>
                         <div class="stat-card-dashboard">
-                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Platform Cost Savings</div>
+                            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Platform
+                                Cost Savings</div>
                             <div class="stat-val-dashboard color-warning">$184.50</div>
                         </div>
                     </div>
@@ -1375,7 +1455,7 @@ return results</pre>
                     <!-- Table Preview mockup -->
                     <div class="dashboard-table-preview">
                         <div class="table-title">
-                            Global User Token Analytics 
+                            Global User Token Analytics
                             <span>LIVE METRICS (OpenTelemetry)</span>
                         </div>
                         <table class="table-mock">
@@ -1431,42 +1511,50 @@ return results</pre>
                         <div class="tech-card">
                             <span class="tech-badge">API Layer</span>
                             <h3 class="tech-name">FastAPI</h3>
-                            <p class="tech-desc">Asynchronous Python web framework with auto-generated OpenAPI documents and robust REST routing.</p>
+                            <p class="tech-desc">Asynchronous Python web framework with auto-generated OpenAPI documents
+                                and robust REST routing.</p>
                         </div>
                         <div class="tech-card">
                             <span class="tech-badge">AI Logic</span>
                             <h3 class="tech-name">LangGraph</h3>
-                            <p class="tech-desc">Stateful multi-agent system builder, supporting circular evaluation loops and node-based transitions.</p>
+                            <p class="tech-desc">Stateful multi-agent system builder, supporting circular evaluation
+                                loops and node-based transitions.</p>
                         </div>
                         <div class="tech-card">
                             <span class="tech-badge">Vector DB</span>
                             <h3 class="tech-name">ChromaDB</h3>
-                            <p class="tech-desc">Local storage system utilized for document embeddings and sub-millisecond semantic caching matches.</p>
+                            <p class="tech-desc">Local storage system utilized for document embeddings and
+                                sub-millisecond semantic caching matches.</p>
                         </div>
                         <div class="tech-card">
                             <span class="tech-badge">Observability</span>
                             <h3 class="tech-name">OTel + Prometheus</h3>
-                            <p class="tech-desc">OpenTelemetry logging integrated with Prometheus scraping and beautiful Grafana dashboards.</p>
+                            <p class="tech-desc">OpenTelemetry logging integrated with Prometheus scraping and beautiful
+                                Grafana dashboards.</p>
                         </div>
                         <div class="tech-card">
                             <span class="tech-badge">LLM Provider</span>
                             <h3 class="tech-name">Gemini 2.0</h3>
-                            <p class="tech-desc">Google Generative Language API provider, dynamically orchestrating and routing multi-agent responses.</p>
+                            <p class="tech-desc">Google Generative Language API provider, dynamically orchestrating and
+                                routing multi-agent responses.</p>
                         </div>
                         <div class="tech-card">
                             <span class="tech-badge">Database</span>
                             <h3 class="tech-name">PostgreSQL</h3>
-                            <p class="tech-desc">SQLAlchemy-driven persistence layer storing user tables, conversations, and workflow trace states.</p>
+                            <p class="tech-desc">SQLAlchemy-driven persistence layer storing user tables, conversations,
+                                and workflow trace states.</p>
                         </div>
                         <div class="tech-card">
                             <span class="tech-badge">Memory Cache</span>
                             <h3 class="tech-name">Redis</h3>
-                            <p class="tech-desc">Memory storage layer utilized for session tokens, FastAPI responses, and rate limiters.</p>
+                            <p class="tech-desc">Memory storage layer utilized for session tokens, FastAPI responses,
+                                and rate limiters.</p>
                         </div>
                         <div class="tech-card">
                             <span class="tech-badge">Environment</span>
                             <h3 class="tech-name">Docker</h3>
-                            <p class="tech-desc">Multi-container Docker Compose file standing up Postgres, Redis, Prometheus, Grafana, and backend services.</p>
+                            <p class="tech-desc">Multi-container Docker Compose file standing up Postgres, Redis,
+                                Prometheus, Grafana, and backend services.</p>
                         </div>
                     </div>
                 </div>
@@ -1478,7 +1566,7 @@ return results</pre>
                     <div class="split-layout reverse">
                         <div class="split-visual">
                             <div class="code-panel" style="width: 100%;">
-<pre style="margin: 0; color: #34d399;">version: '3.8'
+                                <pre style="margin: 0; color: #34d399;">version: '3.8'
 services:
   backend:
     build: ./backend
@@ -1500,13 +1588,49 @@ services:
                                 <p class="slide-subtitle">Ready for production out-of-the-box</p>
                             </div>
                             <p>
-                                NexusFlow ships pre-configured with a complete Docker Compose environment. Launching the backend, database, vector stores, cache, and telemetry requires only one command.
+                                NexusFlow ships pre-configured with a complete Docker Compose environment. Launching the
+                                backend, database, vector stores, cache, and telemetry requires only one command.
                             </p>
-                            <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 6px; font-family: var(--font-mono); font-size: 13px; color: var(--success); border: 1px solid var(--border-color); margin-bottom: 24px;">
+                            <div
+                                style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 6px; font-family: var(--font-mono); font-size: 13px; color: var(--success); border: 1px solid var(--border-color); margin-bottom: 24px;">
                                 docker compose up --build -d
                             </div>
                             <p>
-                                Read our full documentation in the project README, or launch the UI dashboard locally to start executing safe, cached, multi-agent workflows.
+                                Read our full documentation in the project README, or launch the UI dashboard locally to
+                                start executing safe, cached, multi-agent workflows.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11: Enterprise RBAC & Security Audit Logs -->
+            <div class="slide left-align" data-slide="11">
+                <div class="slide-content">
+                    <div class="slide-title-group">
+                        <h2 class="slide-title">Enterprise RBAC & Security Audit Logging</h2>
+                        <p class="slide-subtitle">Comprehensive corporate boundary controls and monitoring capabilities</p>
+                    </div>
+                    <div class="cards-grid-3">
+                        <div class="glass-card">
+                            <span class="card-icon" style="color: #00ff66;">🔐</span>
+                            <h3 class="card-title">Clearance Level Matrix</h3>
+                            <p class="card-desc">
+                                Enforces strict hierarchical security boundaries (PUBLIC to HIGHLY_CONFIDENTIAL) across 8 corporate departments. Managers approve employee files prior to vector indexing.
+                            </p>
+                        </div>
+                        <div class="glass-card">
+                            <span class="card-icon" style="color: #0066ff;">👤</span>
+                            <h3 class="card-title">Self-Service Profile Edit</h3>
+                            <p class="card-desc">
+                                Allows employees to manage their basic corporate information, contact details, and update passwords, with username and deletion locked to higher administration.
+                            </p>
+                        </div>
+                        <div class="glass-card">
+                            <span class="card-icon" style="color: #ef4444;">🛡️</span>
+                            <h3 class="card-title">Immutable Audit Trail</h3>
+                            <p class="card-desc">
+                                Records every login, file upload, document approval, deletion request, and permission denial to PostgreSQL/SQLite, capturing client IP addresses and transaction details.
                             </p>
                         </div>
                     </div>
@@ -1519,7 +1643,11 @@ services:
         <footer>
             <div class="controls-nav">
                 <button class="nav-btn" onclick="prevSlide()" id="prev-btn" aria-label="Previous Slide">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
                 </button>
                 <div class="slide-progress" id="slide-dots">
                     <div class="progress-dot active" onclick="goToSlide(1)"></div>
@@ -1532,9 +1660,14 @@ services:
                     <div class="progress-dot" onclick="goToSlide(8)"></div>
                     <div class="progress-dot" onclick="goToSlide(9)"></div>
                     <div class="progress-dot" onclick="goToSlide(10)"></div>
+                    <div class="progress-dot" onclick="goToSlide(11)"></div>
                 </div>
                 <button class="nav-btn" onclick="nextSlide()" id="next-btn" aria-label="Next Slide">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
                 </button>
             </div>
             <div class="controls-right">
@@ -1549,7 +1682,7 @@ services:
     <!-- Presentation Engine JS -->
     <script>
         let currentSlide = 1;
-        const totalSlides = 10;
+        const totalSlides = 11;
         const slideWrapper = document.getElementById('slides-wrapper');
         const dots = document.querySelectorAll('.progress-dot');
         const slideNumIndicator = document.getElementById('current-slide-num');
@@ -1561,10 +1694,10 @@ services:
 
         function goToSlide(n) {
             if (n < 1 || n > totalSlides) return;
-            
+
             const currentSlideEl = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
             const targetSlideEl = document.querySelector(`.slide[data-slide="${n}"]`);
-            
+
             if (currentSlideEl) {
                 currentSlideEl.classList.remove('active');
                 if (n > currentSlide) {
@@ -1669,11 +1802,13 @@ services:
             retriever: {
                 title: "Retriever Agent (RAG)",
                 type: "DATA RETRIEVAL NODE",
-                desc: "Invokes collection searches on ChromaDB database. Programmatically forces a user_id filter based on JWT authentication details, strictly separating files between tenants. Standard users can never access or query other accounts' files.",
+                desc: "Invokes collection searches on ChromaDB database. Programmatically applies metadata filters based on user department, visibility scope, and clearance level details, ensuring department-based document isolation before similarity checks.",
                 schema: `{
   "query_embeddings": [0.012, -0.045, 0.231, ...],
   "where_clause": {
-    "user_id": "usr_9f82k30h4"
+    "approved": true,
+    "department": "Finance",
+    "classification": "CONFIDENTIAL"
   },
   "retrieved_documents_count": 4
 }`
@@ -1840,4 +1975,5 @@ services:
         }
     </script>
 </body>
+
 </html>
